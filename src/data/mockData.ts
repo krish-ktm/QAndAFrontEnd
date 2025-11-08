@@ -12,9 +12,16 @@ export interface Product {
   tags: string[];
 }
 
+export interface Topic {
+  id: string;
+  productId: string;
+  name: string;
+}
+
 export interface QnA {
   id: string;
   productId: string;
+  topicId: string;
   question: string;
   answer: string;
   company: string[];
@@ -90,10 +97,17 @@ export const mockProducts: Product[] = [
   },
 ];
 
+export const mockTopics: Topic[] = [
+  { id: 't1', productId: '1', name: 'Recursion & Algorithms' },
+  { id: 't2', productId: '1', name: 'Data Structures Fundamentals' },
+  { id: 't3', productId: '2', name: 'Distributed Systems' },
+];
+
 export const mockQnA: QnA[] = [
   {
     id: '1',
     productId: '1',
+    topicId: 't1',
     question: 'What is recursion and when should you use it?',
     answer: 'Recursion is a programming technique where a function calls itself to solve smaller instances of the same problem. Use recursion when: 1) The problem can be broken into similar sub-problems, 2) You need to traverse tree or graph structures, 3) The solution has a natural recursive definition (like factorial or Fibonacci). Always ensure you have a base case to prevent infinite recursion.',
     company: ['Amazon', 'Google', 'Microsoft'],
@@ -103,6 +117,7 @@ export const mockQnA: QnA[] = [
   {
     id: '2',
     productId: '1',
+    topicId: 't2',
     question: 'Explain the difference between Stack and Queue data structures',
     answer: 'Stack follows LIFO (Last In First Out) principle - the last element added is the first to be removed. Common operations: push, pop, peek. Use cases: undo functionality, expression evaluation, backtracking. Queue follows FIFO (First In First Out) principle - the first element added is the first to be removed. Common operations: enqueue, dequeue, front. Use cases: task scheduling, breadth-first search, print queue management.',
     company: ['Amazon', 'Meta'],
@@ -112,6 +127,7 @@ export const mockQnA: QnA[] = [
   {
     id: '3',
     productId: '1',
+    topicId: 't1',
     question: 'What is Dynamic Programming and when should you apply it?',
     answer: 'Dynamic Programming (DP) is an optimization technique that solves complex problems by breaking them into overlapping sub-problems and storing their solutions to avoid redundant calculations. Apply DP when: 1) Problem has optimal substructure (optimal solution contains optimal solutions to sub-problems), 2) Problem has overlapping sub-problems, 3) You can define a recurrence relation. Common examples: Fibonacci, longest common subsequence, knapsack problem. Two approaches: top-down (memoization) and bottom-up (tabulation).',
     company: ['Google', 'Meta', 'Apple'],
@@ -121,6 +137,7 @@ export const mockQnA: QnA[] = [
   {
     id: '4',
     productId: '1',
+    topicId: 't2',
     question: 'How does a Hash Table work and what is collision resolution?',
     answer: 'A Hash Table uses a hash function to map keys to array indices for O(1) average-case lookup, insertion, and deletion. The hash function converts the key into an integer index. Collision occurs when two keys hash to the same index. Resolution methods: 1) Chaining - store multiple elements at same index using linked lists, 2) Open Addressing - find another empty slot using probing (linear, quadratic, or double hashing). Load factor (n/m) affects performance; rehashing occurs when load factor exceeds threshold.',
     company: ['Amazon', 'Google'],
@@ -130,6 +147,7 @@ export const mockQnA: QnA[] = [
   {
     id: '5',
     productId: '2',
+    topicId: 't3',
     question: 'What is CAP theorem in distributed systems?',
     answer: 'CAP theorem states that a distributed system can only guarantee two of three properties: Consistency (all nodes see same data at same time), Availability (every request receives a response), Partition Tolerance (system continues despite network partitions). In practice, partition tolerance is mandatory, so you choose between CP (consistency + partition tolerance) like MongoDB, HBase or AP (availability + partition tolerance) like Cassandra, DynamoDB. Modern systems use eventual consistency as a middle ground.',
     company: ['Amazon', 'Google', 'Netflix'],
@@ -139,6 +157,7 @@ export const mockQnA: QnA[] = [
   {
     id: '6',
     productId: '2',
+    topicId: 't3',
     question: 'Explain the differences between SQL and NoSQL databases',
     answer: 'SQL databases are relational, use structured schemas, support ACID transactions, scale vertically, and use SQL query language. Best for: complex queries, transactions, structured data. Examples: PostgreSQL, MySQL. NoSQL databases are non-relational, have flexible schemas, support BASE properties, scale horizontally. Types: Document (MongoDB), Key-Value (Redis), Column-family (Cassandra), Graph (Neo4j). Best for: large-scale data, rapid development, unstructured data. Choose based on data structure, scalability needs, and consistency requirements.',
     company: ['Meta', 'Twitter', 'Uber'],
