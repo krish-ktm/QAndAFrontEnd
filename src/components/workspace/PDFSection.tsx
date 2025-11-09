@@ -1,17 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileText, Star, ExternalLink, Download } from 'lucide-react';
-import { mockPDFs, PDF } from '../../data/mockData';
+import { apiService } from '../../services/apiService';
+import { PDF } from '../../types/api';
 
 interface PDFSectionProps {
   productId: string;
 }
 
 export const PDFSection = ({ productId }: PDFSectionProps) => {
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(
-    new Set(mockPDFs.filter((pdf) => pdf.bookmarked).map((pdf) => pdf.id))
-  );
-
-  const productPDFs = mockPDFs.filter((pdf) => pdf.productId === productId);
+  const [pdfs, setPdfs] = useState<PDF[]>([]);
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchPDFs = async () => {
+      try {
+        const response = await apiService.getPDFs(productId);
+        if (response.success) {
+          setPdfs(response.data);
+          
+          // In a real app, we would fetch bookmarks from the API
+          // For now, we'll just set random PDFs as bookmarked
+          const randomBookmarks = new Set<string>();
+          response.data.forEach(pdf => {
+            if (Math.random() > 0.7) {
+              randomBookmarks.add(pdf.id);
+            }
+          });
+          setBookmarkedIds(randomBookmarks);
+        } else {
+          setError(response.message || 'Failed to load PDFs');
+        }
+      } catch (err) {
+        console.error('Error fetching PDFs:', err);
+        setError('An error occurred while loading PDFs');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPDFs();
+  }, [productId]);
 
   const toggleBookmark = (id: string) => {
     const newBookmarked = new Set(bookmarkedIds);
@@ -23,17 +53,6 @@ export const PDFSection = ({ productId }: PDFSectionProps) => {
     setBookmarkedIds(newBookmarked);
   };
 
-  if (productPDFs.length === 0) {
-    return (
-      <div className="p-8">
-        <div className="max-w-5xl mx-auto text-center py-12">
-          <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 text-lg">No resources available for this product</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
@@ -42,80 +61,71 @@ export const PDFSection = ({ productId }: PDFSectionProps) => {
           <p className="text-gray-600">Access reference materials and study guides</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {productPDFs.map((pdf: PDF) => {
-            const isBookmarked = bookmarkedIds.has(pdf.id);
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
+            {error}
+          </div>
+        )}
 
-            return (
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {pdfs.map((pdf) => (
               <div
                 key={pdf.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition overflow-hidden"
+                className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="p-6">
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <FileText className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{pdf.title}</h3>
-                        <p className="text-sm text-gray-500">PDF Document</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => toggleBookmark(pdf.id)}
-                      className="flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition"
-                    >
-                      <Star
-                        className={`w-5 h-5 ${
-                          isBookmarked ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'
-                        }`}
-                      />
-                    </button>
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-8 h-8 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-900">{pdf.title}</h3>
                   </div>
+                  <button
+                    onClick={() => toggleBookmark(pdf.id)}
+                    className="text-gray-400 hover:text-yellow-500 transition-colors"
+                  >
+                    <Star
+                      className={`w-5 h-5 ${bookmarkedIds.has(pdf.id) ? 'fill-yellow-400 text-yellow-400' : ''}`}
+                    />
+                  </button>
+                </div>
 
-                  <div className="flex gap-3">
-                    <a
-                      href={pdf.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      View
-                    </a>
-                    <a
-                      href={pdf.url}
-                      download
-                      className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download
-                    </a>
-                  </div>
+                <div className="flex justify-between mt-4">
+                  <a
+                    href={pdf.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Online
+                  </a>
+                  <a
+                    href={pdf.fileUrl}
+                    download
+                    className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-gray-900 mb-2">Resource Tips</h3>
-          <ul className="space-y-2 text-sm text-gray-700">
-            <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">•</span>
-              <span>Use bookmarks to save important resources for quick access</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">•</span>
-              <span>Download PDFs for offline study and reference</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">•</span>
-              <span>Resources are curated to complement the Q&A and quiz sections</span>
-            </li>
-          </ul>
-        </div>
+            ))}
+            
+            {pdfs.length === 0 && (
+              <div className="col-span-2 text-center py-12">
+                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No resources available</h3>
+                <p className="text-gray-500">There are no PDF resources for this product yet.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

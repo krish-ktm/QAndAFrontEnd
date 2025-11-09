@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { mockUsers } from '../../data/mockData';
 import { AnimatedInput } from '../ui/AnimatedInput';
 import { motion } from 'framer-motion';
+import { mockUsers } from '../../services/mockData';
 
 interface LoginProps {
   onToggle: () => void;

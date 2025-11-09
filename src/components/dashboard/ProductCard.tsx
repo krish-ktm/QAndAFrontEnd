@@ -1,12 +1,30 @@
 import { ArrowRight, Tag } from 'lucide-react';
-import { Product } from '../../data/mockData';
+import { Product as ApiProduct } from '../../types/api';
+import { useState, useEffect } from 'react';
 
 interface ProductCardProps {
-  product: Product;
+  product: ApiProduct;
   onSelect: () => void;
 }
 
 export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
+  const [progress, setProgress] = useState<number>(0);
+  const [tags, setTags] = useState<string[]>([]);
+  
+  useEffect(() => {
+    // In a real implementation, we would fetch progress from the API
+    // For now, we'll use a random progress value
+    setProgress(Math.floor(Math.random() * 100));
+    
+    // Generate tags from product name and description
+    const generatedTags = [];
+    if (product.name.includes('Data')) generatedTags.push('Data');
+    if (product.name.includes('System')) generatedTags.push('System Design');
+    if (product.name.includes('Algorithm')) generatedTags.push('Algorithms');
+    if (product.description.includes('interview')) generatedTags.push('Interview Prep');
+    
+    setTags(generatedTags.length > 0 ? generatedTags : ['Learning']);
+  }, [product]);
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden group">
       <div className="p-6">
@@ -19,7 +37,7 @@ export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
         </p>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {product.tags.map((tag) => (
+          {tags.map((tag) => (
             <span
               key={tag}
               className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
@@ -33,12 +51,12 @@ export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
         <div className="mb-4">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>Progress</span>
-            <span className="font-medium">{product.progress}%</span>
+            <span className="font-medium">{progress}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div
               className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500"
-              style={{ width: `${product.progress}%` }}
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>

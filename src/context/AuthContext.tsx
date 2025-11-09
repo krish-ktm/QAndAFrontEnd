@@ -1,75 +1,95 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { User, mockUsers } from '../data/mockData';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { apiService } from '../services/apiService';
+import { AuthUser } from '../types/api';
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Check for existing user session on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+      } catch (error) {
+        console.error('Error restoring auth state:', error);
+        // Clear potentially corrupted data
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (email: string, password: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Check if credentials match any mock user
-    const foundUser = mockUsers.find(
-      user => user.email.toLowerCase() === email.toLowerCase() && user.password === password
-    );
-
-    if (foundUser) {
-      // Create a clean user object without the password
-      const userData: User = {
-        id: foundUser.id,
-        email: foundUser.email,
-        name: foundUser.name
-      };
+    setLoading(true);
+    try {
+      const response = await apiService.login({ email, password });
       
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('authToken', 'mock-jwt-token');
-    } else {
-      throw new Error('Invalid credentials');
+      if (response.success && response.data.user) {
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      } else {
+        throw new Error(response.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    if (email && password && name) {
-      // Check if email already exists
-      const existingUser = mockUsers.find(user => user.email.toLowerCase() === email.toLowerCase());
-      if (existingUser) {
-        throw new Error('Email already in use');
+    setLoading(true);
+    try {
+      const response = await apiService.register({ email, password, name });
+      
+      if (response.success && response.data.user) {
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+      } else {
+        throw new Error(response.message || 'Registration failed');
       }
-      
-      // Create a new user (in a real app, this would be saved to a database)
-      const newUser: User = {
-        id: `${mockUsers.length + 1}`,
-        email,
-        name
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('authToken', 'mock-jwt-token');
-    } else {
-      throw new Error('Invalid registration data');
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('authToken');
+  const logout = async () => {
+    setLoading(true);
+    try {
+      await apiService.logout();
+      setUser(null);
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -80,6 +100,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         isAuthenticated: !!user,
+        loading
       }}
     >
       {children}

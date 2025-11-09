@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, MessageSquare, Brain, FileText } from 'lucide-react';
-import { mockProducts } from '../../data/mockData';
+import { apiService } from '../../services/apiService';
+import { Product } from '../../types/api';
 import { QnASection } from './QnASection';
 import { QuizSection } from './QuizSection';
 import { PDFSection } from './PDFSection';
@@ -14,10 +15,54 @@ type Section = 'qna' | 'quiz' | 'pdf';
 
 export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
   const [activeSection, setActiveSection] = useState<Section>('qna');
-  const product = mockProducts.find((p) => p.id === productId);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!product) {
-    return <div>Product not found</div>;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await apiService.getProductDetail(productId);
+        if (response.success) {
+          setProduct(response.data);
+        } else {
+          setError(response.message || 'Failed to load product');
+        }
+      } catch (err) {
+        console.error('Error fetching product:', err);
+        setError('An error occurred while loading product');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
+          <p className="text-gray-700 mb-6">{error || 'Product not found'}</p>
+          <button
+            onClick={onBack}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const sections = [
@@ -72,10 +117,10 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
               <div className="flex-1 bg-gray-200 rounded-full h-2">
                 <div
                   className="bg-blue-600 h-full rounded-full transition-all"
-                  style={{ width: `${product.progress}%` }}
+                  style={{ width: `50%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-900">{product.progress}%</span>
+              <span className="text-sm font-medium text-gray-900">50%</span>
             </div>
           </div>
         </div>

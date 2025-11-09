@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { BookOpen } from 'lucide-react';
-import { mockProducts, Product } from '../../data/mockData';
+import { apiService } from '../../services/apiService';
+import { Product } from '../../types/api';
 import { ProductCard } from './ProductCard';
 
 interface DashboardProps {
@@ -7,6 +9,30 @@ interface DashboardProps {
 }
 
 export const Dashboard = ({ onSelectProduct }: DashboardProps) => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await apiService.getProducts();
+        if (response.success) {
+          setProducts(response.data);
+        } else {
+          setError(response.message || 'Failed to load products');
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('An error occurred while loading products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -20,15 +46,34 @@ export const Dashboard = ({ onSelectProduct }: DashboardProps) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockProducts.map((product: Product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onSelect={() => onSelectProduct(product.id)}
-            />
-          ))}
-        </div>
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        )}
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product: Product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onSelect={() => onSelectProduct(product.id)}
+              />
+            ))}
+            {products.length === 0 && (
+              <div className="col-span-3 text-center py-12 text-gray-500">
+                No products available. Please check back later.
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

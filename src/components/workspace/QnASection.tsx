@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Star, ChevronDown, ChevronUp, Building2, TrendingUp, BookOpen, List, LayoutGrid, Rows } from 'lucide-react';
-import { mockQnA, mockTopics, QnA } from '../../data/mockData';
+import { apiService } from '../../services/apiService';
+import { QnA, Topic } from '../../types/api';
 
 interface QnASectionProps {
   productId: string;
@@ -11,25 +12,86 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(
-    new Set(mockQnA.filter(q => q.bookmarked).map(q => q.id))
-  );
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'vertical' | 'horizontal' | 'grid'>('vertical');
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const horizontalScrollRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 5;
-
-  const productTopics = useMemo(() => mockTopics.filter((t) => t.productId === productId), [productId]);
-  const [selectedTopicId, setSelectedTopicId] = useState<string>(productTopics[0]?.id ?? '');
-
-  const productQnA = useMemo(() => mockQnA.filter((qna) => qna.topicId === selectedTopicId), [selectedTopicId]);
+  
+  // State for API data
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [qnas, setQnas] = useState<QnA[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch topics for the product
+  useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const response = await apiService.getTopics(productId);
+        if (response.success) {
+          setTopics(response.data);
+          if (response.data.length > 0) {
+            setSelectedTopicId(response.data[0].id);
+          }
+        } else {
+          setError(response.message || 'Failed to load topics');
+        }
+      } catch (err) {
+        console.error('Error fetching topics:', err);
+        setError('An error occurred while loading topics');
+      }
+    };
+    
+    fetchTopics();
+  }, [productId]);
+  
+  // Selected topic
+  const [selectedTopicId, setSelectedTopicId] = useState<string>('');
+  
+  // Fetch QnAs for the selected topic
+  useEffect(() => {
+    if (!selectedTopicId) return;
+    
+    const fetchQnAs = async () => {
+      setLoading(true);
+      try {
+        const response = await apiService.getQnA(productId, { topicId: selectedTopicId });
+        if (response.success) {
+          setQnas(response.data.items);
+          
+          // In a real app, we would fetch bookmarks from the API
+          // For now, we'll just set random QnAs as bookmarked
+          const randomBookmarks = new Set<string>();
+          response.data.items.forEach(qna => {
+            if (Math.random() > 0.7) {
+              randomBookmarks.add(qna.id);
+            }
+          });
+          setBookmarkedIds(randomBookmarks);
+        } else {
+          setError(response.message || 'Failed to load Q&As');
+        }
+      } catch (err) {
+        console.error('Error fetching Q&As:', err);
+        setError('An error occurred while loading Q&As');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchQnAs();
+  }, [productId, selectedTopicId]);
+  
+  // Use qnas instead of productQnA
+  const productQnA = qnas;
 
   // productQnA is now computed based on selectedTopicId above
 
   const allCompanies = useMemo(() => {
     const companies = new Set<string>();
-    productQnA.forEach((qna) => qna.company.forEach((c) => companies.add(c)));
+    productQnA.forEach((qna) => qna.companyTags.forEach((c: string) => companies.add(c)));
     return Array.from(companies).sort();
   }, [productQnA]);
 
@@ -41,10 +103,12 @@ export const QnASection = ({ productId }: QnASectionProps) => {
         qna.answer.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesCompany =
-        selectedCompany === 'all' || qna.company.includes(selectedCompany);
+        selectedCompany === 'all' || qna.companyTags.includes(selectedCompany);
 
+      // Convert level to lowercase for comparison
+      const qnaLevel = qna.level.toLowerCase();
       const matchesDifficulty =
-        selectedDifficulty === 'all' || qna.difficulty === selectedDifficulty;
+        selectedDifficulty === 'all' || qnaLevel === selectedDifficulty.toLowerCase();
 
       return matchesSearch && matchesCompany && matchesDifficulty;
     });
@@ -92,13 +156,15 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   }, [viewMode]);
 
   const toggleExpand = (id: string) => {
-    const newExpanded = new Set(expandedIds);
-    if (newExpanded.has(id)) {
-      newExpanded.delete(id);
-    } else {
-      newExpanded.add(id);
-    }
-    setExpandedIds(newExpanded);
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   const toggleBookmark = (id: string) => {
@@ -112,7 +178,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   };
 
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
+    switch (difficulty.toLowerCase()) {
       case 'beginner':
         return 'bg-green-100 text-green-700';
       case 'intermediate':
@@ -124,6 +190,38 @@ export const QnASection = ({ productId }: QnASectionProps) => {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Q&A content...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show error state
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg mb-6">
+            <h3 className="text-lg font-medium mb-2">Error</h3>
+            <p>{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
@@ -192,7 +290,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                   }}
                   className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
                 >
-                  {productTopics.map((topic) => (
+                  {topics.map((topic: Topic) => (
                     <option key={topic.id} value={topic.id}>
                       {topic.name}
                     </option>
@@ -271,26 +369,31 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                     </div>
 
                     <div className="flex flex-wrap gap-2 mb-4">
-                      <span
-                        className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(
-                          qna.difficulty
-                        )}`}
-                      >
-                        {qna.difficulty.charAt(0).toUpperCase() + qna.difficulty.slice(1)}
-                      </span>
-                      {qna.company.map((company) => (
                         <span
-                          key={company}
-                          className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
+                          className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(
+                            qna.level
+                          )}`}
                         >
-                          {company}
+                          {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
                         </span>
-                      ))}
+                        {qna.companyTags.map((company: string) => (
+                          <span
+                            key={company}
+                            className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
+                          >
+                            {company}
+                          </span>
+                        ))}
                     </div>
 
                     {isExpanded && (
-                      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-                        <p className="text-gray-700 leading-relaxed">{qna.answer}</p>
+                      <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-4">
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">{qna.answer}</p>
+                        {qna.exampleCode && (
+                          <pre className="bg-gray-800 text-gray-100 text-sm p-4 rounded-lg overflow-x-auto">
+                            {qna.exampleCode}
+                          </pre>
+                        )}
                       </div>
                     )}
 
@@ -352,12 +455,12 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                         <div className="flex flex-wrap gap-2 mb-4">
                           <span
                             className={`px-3 py-1 text-xs font-medium rounded-full ${
-                              getDifficultyColor(qna.difficulty)
+                              getDifficultyColor(qna.level)
                             }`}
                           >
-                            {qna.difficulty.charAt(0).toUpperCase() + qna.difficulty.slice(1)}
+                            {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
                           </span>
-                          {qna.company.map((company) => (
+                          {qna.companyTags.map((company: string) => (
                             <span
                               key={company}
                               className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
@@ -368,8 +471,13 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                         </div>
 
                         {isExpanded && (
-                          <div className="mb-4 p-4 bg-gray-50 rounded-lg flex-1 overflow-auto">
-                            <p className="text-gray-700 leading-relaxed">{qna.answer}</p>
+                          <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-4">
+                            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{qna.answer}</p>
+                            {qna.exampleCode && (
+                              <pre className="bg-gray-800 text-gray-100 text-sm p-4 rounded-lg overflow-x-auto">
+                                {qna.exampleCode}
+                              </pre>
+                            )}
                           </div>
                         )}
 
@@ -493,12 +601,12 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       <span
                         className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                          getDifficultyColor(qna.difficulty)
+                          getDifficultyColor(qna.level)
                         }`}
                       >
-                        {qna.difficulty.charAt(0).toUpperCase() + qna.difficulty.slice(1)}
+                        {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
                       </span>
-                      {qna.company.slice(0, 2).map((company) => (
+                      {qna.companyTags.slice(0, 2).map((company: string) => (
                         <span
                           key={company}
                           className="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
@@ -506,9 +614,9 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                           {company}
                         </span>
                       ))}
-                      {qna.company.length > 2 && (
+                      {qna.companyTags.length > 2 && (
                         <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
-                          +{qna.company.length - 2} more
+                          +{qna.companyTags.length - 2} more
                         </span>
                       )}
                     </div>

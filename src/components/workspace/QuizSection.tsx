@@ -1,45 +1,90 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, RotateCcw, Trophy } from 'lucide-react';
-import { mockQuizzes, Quiz } from '../../data/mockData';
+import { apiService } from '../../services/apiService';
+import { Quiz } from '../../types/api';
 
 interface QuizSectionProps {
   productId: string;
 }
 
-interface QuizAttempt {
+interface LocalQuizAttempt {
   quizId: string;
-  selectedAnswer: number;
+  selectedAnswer: string;
   isCorrect: boolean;
 }
 
 export const QuizSection = ({ productId }: QuizSectionProps) => {
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
-
-  const productQuizzes = mockQuizzes.filter((quiz) => quiz.productId === productId);
-  const currentQuiz = productQuizzes[currentQuizIndex];
-  const isLastQuiz = currentQuizIndex === productQuizzes.length - 1;
-  const isQuizCompleted = attempts.length === productQuizzes.length;
+  const [attempts, setAttempts] = useState<LocalQuizAttempt[]>([]);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch quizzes for the product
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await apiService.getQuizzes(productId);
+        if (response.success) {
+          setQuizzes(response.data.items);
+        } else {
+          setError(response.message || 'Failed to load quizzes');
+        }
+      } catch (err) {
+        console.error('Error fetching quizzes:', err);
+        setError('An error occurred while loading quizzes');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchQuizzes();
+  }, [productId]);
+  
+  const currentQuiz = quizzes[currentQuizIndex];
+  const isLastQuiz = currentQuizIndex === quizzes.length - 1;
+  const isQuizCompleted = attempts.length === quizzes.length;
 
   const correctAnswers = attempts.filter((a) => a.isCorrect).length;
-  const totalQuizzes = productQuizzes.length;
+  const totalQuizzes = quizzes.length;
   const score = totalQuizzes > 0 ? Math.round((correctAnswers / totalQuizzes) * 100) : 0;
 
-  const handleSubmit = () => {
-    if (selectedAnswer === null) return;
-
+  const handleSubmit = async () => {
+    if (selectedAnswer === null || !currentQuiz) return;
+    
+    // In a real implementation, we would submit the answer to the API
+    // For now, we'll just check locally
     const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
-    setAttempts([
-      ...attempts,
-      {
-        quizId: currentQuiz.id,
-        selectedAnswer,
-        isCorrect,
-      },
-    ]);
+    
+    // Create a new attempt
+    const newAttempt: LocalQuizAttempt = {
+      quizId: currentQuiz.id,
+      selectedAnswer,
+      isCorrect,
+    };
+    
+    setAttempts([...attempts, newAttempt]);
     setShowResult(true);
+    
+    // In a real implementation, we would submit the answer to the API like this:
+    // try {
+    //   const response = await apiService.submitQuizAnswer(productId, currentQuiz.id, {
+    //     selectedAnswer,
+    //     timeTaken: 30 // You could track time taken to answer
+    //   });
+    //   if (response.success) {
+    //     setAttempts([...attempts, {
+    //       quizId: currentQuiz.id,
+    //       selectedAnswer,
+    //       isCorrect: response.data.isCorrect
+    //     }]);
+    //     setShowResult(true);
+    //   }
+    // } catch (err) {
+    //   console.error('Error submitting answer:', err);
+    // }
   };
 
   const handleNext = () => {
@@ -59,11 +104,51 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
     setAttempts([]);
   };
 
-  if (!currentQuiz || productQuizzes.length === 0) {
+  if (loading) {
     return (
       <div className="p-8">
-        <div className="max-w-3xl mx-auto text-center py-12">
+        <div className="max-w-5xl mx-auto text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading quizzes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg mb-6">
+            <h3 className="text-lg font-medium mb-2">Error</h3>
+            <p>{error}</p>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (quizzes.length === 0) {
+    return (
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto text-center py-12">
           <p className="text-gray-600 text-lg">No quizzes available for this product</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentQuiz) {
+    return (
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto text-center py-12">
+          <p className="text-gray-600 text-lg">Quiz not found</p>
         </div>
       </div>
     );
@@ -145,32 +230,29 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">{currentQuiz.question}</h2>
 
-          <div className="space-y-3 mb-6">
+          <div className="grid grid-cols-1 gap-4 mb-6">
             {currentQuiz.options.map((option, index) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrect = index === currentQuiz.correctAnswer;
-              const showCorrectAnswer = showResult && isCorrect;
-              const showIncorrectAnswer = showResult && isSelected && !isCorrect;
+              const optionLetter = String.fromCharCode(65 + index); // A, B, C, D...
+              const isSelected = selectedAnswer === optionLetter;
+              const isCorrectAnswer = showResult && optionLetter === currentQuiz.correctAnswer;
+              const isWrongSelection = showResult && isSelected && !isCorrectAnswer;
 
               return (
                 <button
                   key={index}
-                  onClick={() => !showResult && setSelectedAnswer(index)}
+                  onClick={() => !showResult && setSelectedAnswer(optionLetter)}
                   disabled={showResult}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition ${
-                    showCorrectAnswer
-                      ? 'border-green-500 bg-green-50'
-                      : showIncorrectAnswer
-                      ? 'border-red-500 bg-red-50'
-                      : isSelected
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  } ${showResult ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                  className={`flex items-center p-4 border rounded-lg transition ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'} 
+                    ${isCorrectAnswer ? 'border-green-500 bg-green-50' : ''}
+                    ${isWrongSelection ? 'border-red-500 bg-red-50' : ''}`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">{option}</span>
-                    {showCorrectAnswer && <CheckCircle2 className="w-6 h-6 text-green-600" />}
-                    {showIncorrectAnswer && <XCircle className="w-6 h-6 text-red-600" />}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-700 font-medium">{optionLetter}</span>
+                      <span className="font-medium text-gray-900">{option}</span>
+                    </div>
+                    {isCorrectAnswer && <CheckCircle2 className="w-6 h-6 text-green-600" />}
+                    {isWrongSelection && <XCircle className="w-6 h-6 text-red-600" />}
                   </div>
                 </button>
               );
