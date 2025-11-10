@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Star, ChevronDown, ChevronUp, Building2, TrendingUp, BookOpen, List, LayoutGrid, Rows } from 'lucide-react';
+import { Search, Star, ChevronDown, ChevronUp, Building2, TrendingUp, BookOpen, Rows } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic } from '../../types/api';
 
@@ -240,24 +240,6 @@ export const QnASection = ({ productId }: QnASectionProps) => {
               >
                 <Rows className="w-5 h-5" />
                 <span className="hidden sm:inline">List</span>
-              </button>
-              <button
-                onClick={() => setViewMode('horizontal')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${viewMode === 'horizontal' ? 'bg-gray-200 text-gray-800 font-medium shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}
-                aria-label="Horizontal list view"
-                title="Horizontal list view"
-              >
-                <List className="w-5 h-5" />
-                <span className="hidden sm:inline">Carousel</span>
-              </button>
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-gray-200 text-gray-800 font-medium shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}
-                aria-label="Grid view"
-                title="Grid view"
-              >
-                <LayoutGrid className="w-5 h-5" />
-                <span className="hidden sm:inline">Grid</span>
               </button>
             </div>
           </div>

@@ -96,7 +96,34 @@ export const mockTopics: Topic[] = [
 ];
 
 // Mock Q&A
-export const mockQnAs: QnA[] = [
+export const mockQnAs: QnA[] = (() => {
+  const topics = ['t1', 't2', 't3'];
+  const companies = ['Amazon', 'Google', 'Microsoft', 'Meta', 'Apple', 'Netflix', 'Uber', 'Twitter'];
+  const levels = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'] as const;
+  const now = new Date().toISOString();
+
+  const items: QnA[] = [];
+  topics.forEach(topicId => {
+    for (let i = 1; i <= 100; i++) {
+      const level = levels[i % levels.length];
+      items.push({
+        id: `${topicId}-${i}`,
+        topicId,
+        question: `Sample question ${i} for topic ${topicId}`,
+        answer: `Sample answer ${i} for topic ${topicId}.`,
+        ...(i % 5 === 0 ? {} : { exampleCode: `// Example code snippet ${i}` }),
+        level,
+        companyTags: [companies[i % companies.length]],
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+  });
+  return items;
+})();
+
+/* Legacy hard-coded QnAs retained below for reference but excluded from build
+[
   {
     id: '1',
     topicId: 't1',
@@ -164,6 +191,8 @@ export const mockQnAs: QnA[] = [
     updatedAt: '2023-02-21T10:15:00.000Z'
   },
 ];
+
+*/
 
 // Mock Quizzes
 export const mockQuizzes: Quiz[] = [
