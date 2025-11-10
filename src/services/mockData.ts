@@ -3,6 +3,7 @@ import {
   Product, 
   Topic, 
   QnA, 
+  QuizGroup,
   Quiz, 
   PDF,
   Bookmark,
@@ -11,6 +12,7 @@ import {
   UserStats
 } from '../types/api';
 
+// Mock Users
 // Mock Users
 export const mockUsers: (AuthUser & { password: string })[] = [
   {
@@ -194,11 +196,45 @@ export const mockQnAs: QnA[] = (() => {
 
 */
 
+// Mock Quiz Groups
+export const mockQuizGroups: QuizGroup[] = [
+  {
+    id: 'qg1',
+    productId: '1',
+    name: 'Algorithm Complexity',
+    description: 'Test your knowledge of algorithm time and space complexity',
+    order: 1,
+    isActive: true,
+    createdAt: '2023-01-17T10:00:00.000Z',
+    updatedAt: '2023-01-17T10:00:00.000Z'
+  },
+  {
+    id: 'qg2',
+    productId: '1',
+    name: 'Data Structures',
+    description: 'Questions about common data structures and their implementations',
+    order: 2,
+    isActive: true,
+    createdAt: '2023-01-17T10:15:00.000Z',
+    updatedAt: '2023-01-17T10:15:00.000Z'
+  },
+  {
+    id: 'qg3',
+    productId: '2',
+    name: 'System Design Patterns',
+    description: 'Common design patterns used in system architecture',
+    order: 1,
+    isActive: true,
+    createdAt: '2023-02-22T12:00:00.000Z',
+    updatedAt: '2023-02-22T12:00:00.000Z'
+  },
+];
+
 // Mock Quizzes
 export const mockQuizzes: Quiz[] = [
   {
     id: '1',
-    topicId: 't1',
+    quizGroupId: 'qg1',
     question: 'What is the time complexity of binary search on a sorted array?',
     options: ['O(n)', 'O(log n)', 'O(n log n)', 'O(1)'],
     correctAnswer: 'B',
@@ -210,7 +246,7 @@ export const mockQuizzes: Quiz[] = [
   },
   {
     id: '2',
-    topicId: 't2',
+    quizGroupId: 'qg2',
     question: 'Which data structure is best for implementing a LRU cache?',
     options: ['Array', 'Hash Map + Doubly Linked List', 'Binary Tree', 'Stack'],
     correctAnswer: 'B',
@@ -222,7 +258,7 @@ export const mockQuizzes: Quiz[] = [
   },
   {
     id: '3',
-    topicId: 't1',
+    quizGroupId: 'qg1',
     question: 'What is the worst-case time complexity of QuickSort?',
     options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(log n)'],
     correctAnswer: 'C',
@@ -234,7 +270,7 @@ export const mockQuizzes: Quiz[] = [
   },
   {
     id: '4',
-    topicId: 't3',
+    quizGroupId: 'qg3',
     question: 'Which design pattern is used for creating a single instance of a class?',
     options: ['Factory Pattern', 'Observer Pattern', 'Singleton Pattern', 'Strategy Pattern'],
     correctAnswer: 'C',
@@ -246,7 +282,7 @@ export const mockQuizzes: Quiz[] = [
   },
   {
     id: '5',
-    topicId: 't3',
+    quizGroupId: 'qg3',
     question: 'What is the primary purpose of a load balancer?',
     options: ['Data encryption', 'Distribute traffic across servers', 'Store user sessions', 'Cache static content'],
     correctAnswer: 'B',

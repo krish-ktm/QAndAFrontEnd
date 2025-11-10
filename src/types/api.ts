@@ -130,9 +130,20 @@ export interface QnA {
   updatedAt: string;
 }
 
+export interface QuizGroup {
+  id: string;
+  productId: string;
+  name: string;
+  description: string;
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Quiz {
   id: string;
-  topicId: string;
+  quizGroupId: string;
   question: string;
   options: string[];
   correctAnswer: string;
@@ -183,4 +194,19 @@ export interface RevokeProductAccessRequest {
 
 export interface ChangeUserRoleRequest {
   role: 'USER' | 'ADMIN' | 'MASTER_ADMIN';
+}
+
+// Refresh and Reset Token Types
+export interface RefreshToken {
+  id: string;
+  userId: string;
+  token: string;
+  expiresAt: string;
+}
+
+export interface PasswordResetToken {
+  id: string;
+  userId: string;
+  token: string;
+  expiresAt: string;
 }

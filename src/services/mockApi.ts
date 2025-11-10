@@ -8,6 +8,7 @@ import {
   Product,
   Topic,
   QnA,
+  QuizGroup,
   Quiz,
   PDF,
   Bookmark,
@@ -23,6 +24,7 @@ import {
   mockProducts,
   mockTopics,
   mockQnAs,
+  mockQuizGroups,
   mockQuizzes,
   mockPDFs,
   mockBookmarks,
@@ -396,11 +398,31 @@ export const mockProductApi = {
     
     return createResponse(qna);
   },
+
+  getQuizGroups: async (productId: string): Promise<ApiResponse<QuizGroup[]>> => {
+    await delay();
+    
+    const productQuizGroups = mockQuizGroups.filter(quizGroup => quizGroup.productId === productId);
+    
+    return createResponse(productQuizGroups);
+  },
+  
+  getQuizGroupDetail: async (productId: string, quizGroupId: string): Promise<ApiResponse<QuizGroup>> => {
+    await delay();
+    
+    const quizGroup = mockQuizGroups.find(quizGroup => quizGroup.id === quizGroupId && quizGroup.productId === productId);
+    
+    if (!quizGroup) {
+      throw new Error('Quiz group not found');
+    }
+    
+    return createResponse(quizGroup);
+  },
   
   getQuizzes: async (
     productId: string, 
     filters: { 
-      topicId?: string; 
+      quizGroupId?: string; 
       level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
       company?: string;
       page?: number;
@@ -409,16 +431,16 @@ export const mockProductApi = {
   ): Promise<ApiResponse<PaginatedResponse<Quiz>>> => {
     await delay();
     
-    // Get topics for this product
-    const productTopicIds = mockTopics
-      .filter(topic => topic.productId === productId)
-      .map(topic => topic.id);
+    // Get quiz groups for this product
+    const productQuizGroupIds = mockQuizGroups
+      .filter(quizGroup => quizGroup.productId === productId)
+      .map(quizGroup => quizGroup.id);
     
     // Filter Quizzes
-    let filteredQuizzes = mockQuizzes.filter(quiz => productTopicIds.includes(quiz.topicId));
+    let filteredQuizzes = mockQuizzes.filter(quiz => productQuizGroupIds.includes(quiz.quizGroupId));
     
-    if (filters.topicId) {
-      filteredQuizzes = filteredQuizzes.filter(quiz => quiz.topicId === filters.topicId);
+    if (filters.quizGroupId) {
+      filteredQuizzes = filteredQuizzes.filter(quiz => quiz.quizGroupId === filters.quizGroupId);
     }
     
     if (filters.level) {
@@ -444,10 +466,10 @@ export const mockProductApi = {
       throw new Error('Quiz not found');
     }
     
-    // Verify this Quiz belongs to a topic in this product
-    const topic = mockTopics.find(topic => topic.id === quiz.topicId);
+    // Verify this Quiz belongs to a quiz group in this product
+    const quizGroup = mockQuizGroups.find(quizGroup => quizGroup.id === quiz.quizGroupId);
     
-    if (!topic || topic.productId !== productId) {
+    if (!quizGroup || quizGroup.productId !== productId) {
       throw new Error('Quiz not found in this product');
     }
     
@@ -467,10 +489,10 @@ export const mockProductApi = {
       throw new Error('Quiz not found');
     }
     
-    // Verify this Quiz belongs to a topic in this product
-    const topic = mockTopics.find(topic => topic.id === quiz.topicId);
+    // Verify this Quiz belongs to a quiz group in this product
+    const quizGroup = mockQuizGroups.find(quizGroup => quizGroup.id === quiz.quizGroupId);
     
-    if (!topic || topic.productId !== productId) {
+    if (!quizGroup || quizGroup.productId !== productId) {
       throw new Error('Quiz not found in this product');
     }
     

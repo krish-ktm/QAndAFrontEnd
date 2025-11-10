@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, XCircle, RotateCcw, Trophy } from 'lucide-react';
+import { CheckCircle2, XCircle, RotateCcw, Trophy, ArrowLeft } from 'lucide-react';
 import { apiService } from '../../services/apiService';
-import { Quiz } from '../../types/api';
+import { Quiz, QuizGroup } from '../../types/api';
+import { QuizSelectionView } from './QuizSelectionView';
+import { QuizGroupView } from './QuizGroupView';
 
 interface QuizSectionProps {
   productId: string;
@@ -14,6 +16,11 @@ interface LocalQuizAttempt {
 }
 
 export const QuizSection = ({ productId }: QuizSectionProps) => {
+  // Flow state
+  const [view, setView] = useState<'groups' | 'quizzes' | 'active'>('groups');
+  const [selectedQuizGroup, setSelectedQuizGroup] = useState<QuizGroup | null>(null);
+  
+  // Quiz state
   const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -22,26 +29,40 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Fetch quizzes for the product
-  useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        const response = await apiService.getQuizzes(productId);
-        if (response.success) {
-          setQuizzes(response.data.items);
-        } else {
-          setError(response.message || 'Failed to load quizzes');
-        }
-      } catch (err) {
-        console.error('Error fetching quizzes:', err);
-        setError('An error occurred while loading quizzes');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Handle quiz group selection
+  const handleSelectQuizGroup = (quizGroup: QuizGroup) => {
+    setSelectedQuizGroup(quizGroup);
+    setView('quizzes');
+  };
+  
+  // Handle going back to quiz groups
+  const handleBackToGroups = () => {
+    setView('groups');
+    setSelectedQuizGroup(null);
+  };
+  
+  // Handle quiz selection
+  const handleSelectQuiz = (quiz: Quiz, allQuizzes?: Quiz[]) => {
+    setView('active');
+    setCurrentQuizIndex(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setAttempts([]);
+    setLoading(false);
     
-    fetchQuizzes();
-  }, [productId]);
+    // If allQuizzes is provided, use that (for full quiz mode)
+    // Otherwise, just use the single quiz
+    setQuizzes(allQuizzes || [quiz]);
+  };
+  
+  // Handle going back to quiz selection
+  const handleBackToQuizzes = () => {
+    setView('quizzes');
+    setCurrentQuizIndex(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setAttempts([]);
+  };
   
   const currentQuiz = quizzes[currentQuizIndex];
   const isLastQuiz = currentQuizIndex === quizzes.length - 1;
@@ -51,40 +72,69 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
   const totalQuizzes = quizzes.length;
   const score = totalQuizzes > 0 ? Math.round((correctAnswers / totalQuizzes) * 100) : 0;
 
+  // Track time taken to answer
+  const [startTime, setStartTime] = useState<number | null>(null);
+  
+  // Set start time when a new quiz is loaded
+  useEffect(() => {
+    if (currentQuiz && !showResult) {
+      setStartTime(Date.now());
+    }
+  }, [currentQuiz, currentQuizIndex, showResult]);
+  
   const handleSubmit = async () => {
     if (selectedAnswer === null || !currentQuiz) return;
     
-    // In a real implementation, we would submit the answer to the API
-    // For now, we'll just check locally
-    const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
-    
-    // Create a new attempt
-    const newAttempt: LocalQuizAttempt = {
-      quizId: currentQuiz.id,
-      selectedAnswer,
-      isCorrect,
-    };
-    
-    setAttempts([...attempts, newAttempt]);
-    setShowResult(true);
-    
-    // In a real implementation, we would submit the answer to the API like this:
-    // try {
-    //   const response = await apiService.submitQuizAnswer(productId, currentQuiz.id, {
-    //     selectedAnswer,
-    //     timeTaken: 30 // You could track time taken to answer
-    //   });
-    //   if (response.success) {
-    //     setAttempts([...attempts, {
-    //       quizId: currentQuiz.id,
-    //       selectedAnswer,
-    //       isCorrect: response.data.isCorrect
-    //     }]);
-    //     setShowResult(true);
-    //   }
-    // } catch (err) {
-    //   console.error('Error submitting answer:', err);
-    // }
+    try {
+      // Calculate time taken in seconds
+      const timeTaken = startTime ? Math.round((Date.now() - startTime) / 1000) : 30;
+      
+      // Submit the answer to the API
+      const response = await apiService.submitQuizAnswer(productId, currentQuiz.id, {
+        selectedAnswer,
+        timeTaken
+      });
+      
+      if (response.success) {
+        // Create a new attempt based on API response
+        const newAttempt: LocalQuizAttempt = {
+          quizId: currentQuiz.id,
+          selectedAnswer,
+          isCorrect: response.data.isCorrect,
+        };
+        
+        setAttempts([...attempts, newAttempt]);
+        setShowResult(true);
+      } else {
+        // Fallback to local checking if API fails
+        const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
+        
+        const newAttempt: LocalQuizAttempt = {
+          quizId: currentQuiz.id,
+          selectedAnswer,
+          isCorrect,
+        };
+        
+        setAttempts([...attempts, newAttempt]);
+        setShowResult(true);
+        
+        console.error('API Error:', response.message);
+      }
+    } catch (err) {
+      // Fallback to local checking if API call fails
+      const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
+      
+      const newAttempt: LocalQuizAttempt = {
+        quizId: currentQuiz.id,
+        selectedAnswer,
+        isCorrect,
+      };
+      
+      setAttempts([...attempts, newAttempt]);
+      setShowResult(true);
+      
+      console.error('Error submitting answer:', err);
+    }
   };
 
   const handleNext = () => {
@@ -104,14 +154,19 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
     setAttempts([]);
   };
 
-  if (loading) {
+  // Show the appropriate view based on the current state
+  if (view === 'groups') {
+    return <QuizGroupView productId={productId} onSelectQuizGroup={handleSelectQuizGroup} />;
+  }
+  
+  if (view === 'quizzes' && selectedQuizGroup) {
     return (
-      <div className="p-8">
-        <div className="max-w-5xl mx-auto text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading quizzes...</p>
-        </div>
-      </div>
+      <QuizSelectionView 
+        productId={productId} 
+        quizGroup={selectedQuizGroup}
+        onSelectQuiz={handleSelectQuiz} 
+        onBackToQuizGroups={handleBackToGroups}
+      />
     );
   }
 
@@ -208,9 +263,30 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
     );
   }
 
+  // Loading state for active quiz
+  if (loading && quizzes.length === 0) {
+    return (
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading quiz...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8">
       <div className="max-w-3xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={handleBackToQuizzes}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-medium">Back to Quiz Selection</span>
+        </button>
+        
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold text-gray-900">Quiz Challenge</h1>

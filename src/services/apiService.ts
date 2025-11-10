@@ -25,6 +25,7 @@ import {
   Product,
   Topic,
   QnA,
+  QuizGroup,
   Quiz,
   PDF,
   QuizSubmitRequest,
@@ -51,6 +52,11 @@ export class APIService {
     this.userService = new UserService(this.apiClient);
     this.productService = new ProductService(this.apiClient);
     this.adminService = new AdminService(this.apiClient);
+  }
+  
+  // Method to get the admin service when needed
+  getAdminService(): AdminService {
+    return this.adminService;
   }
 
   // Auth methods
@@ -229,10 +235,24 @@ export class APIService {
     return this.productService.getQnADetail(productId, qnaId);
   }
 
+  async getQuizGroups(productId: string): Promise<ApiResponse<QuizGroup[]>> {
+    if (USE_MOCK_API) {
+      return mockProductApi.getQuizGroups(productId);
+    }
+    return this.productService.getQuizGroups(productId);
+  }
+
+  async getQuizGroupDetail(productId: string, quizGroupId: string): Promise<ApiResponse<QuizGroup>> {
+    if (USE_MOCK_API) {
+      return mockProductApi.getQuizGroupDetail(productId, quizGroupId);
+    }
+    return this.productService.getQuizGroupDetail(productId, quizGroupId);
+  }
+
   async getQuizzes(
     productId: string, 
     filters: { 
-      topicId?: string; 
+      quizGroupId?: string; 
       level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
       company?: string;
       page?: number;
@@ -262,14 +282,14 @@ export class APIService {
     }
     return this.productService.submitQuizAnswer(productId, quizId, data);
   }
-
+  
   async getPDFs(productId: string): Promise<ApiResponse<PDF[]>> {
     if (USE_MOCK_API) {
       return mockProductApi.getPDFs(productId);
     }
     return this.productService.getPDFs(productId);
   }
-
+  
   async getPDFDetail(productId: string, pdfId: string): Promise<ApiResponse<PDF>> {
     if (USE_MOCK_API) {
       return mockProductApi.getPDFDetail(productId, pdfId);

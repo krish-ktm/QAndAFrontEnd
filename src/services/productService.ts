@@ -4,6 +4,7 @@ import {
   Product, 
   Topic, 
   QnA, 
+  QuizGroup,
   Quiz,
   PDF,
   PaginatedResponse,
@@ -76,12 +77,26 @@ export class ProductService {
   }
 
   /**
+   * Get quiz groups for a product
+   */
+  async getQuizGroups(productId: string): Promise<ApiResponse<QuizGroup[]>> {
+    return await this.apiClient.get<QuizGroup[]>(`/products/${productId}/quiz-groups`);
+  }
+
+  /**
+   * Get quiz group detail
+   */
+  async getQuizGroupDetail(productId: string, quizGroupId: string): Promise<ApiResponse<QuizGroup>> {
+    return await this.apiClient.get<QuizGroup>(`/products/${productId}/quiz-groups/${quizGroupId}`);
+  }
+
+  /**
    * Get quizzes for a product (with optional filters)
    */
   async getQuizzes(
     productId: string, 
     filters: { 
-      topicId?: string; 
+      quizGroupId?: string;
       level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
       company?: string;
       page?: number;
@@ -90,7 +105,7 @@ export class ProductService {
   ): Promise<ApiResponse<PaginatedResponse<Quiz>>> {
     const queryParams = new URLSearchParams();
     
-    if (filters.topicId) queryParams.append('topicId', filters.topicId);
+    if (filters.quizGroupId) queryParams.append('quizGroupId', filters.quizGroupId);
     if (filters.level) queryParams.append('level', filters.level);
     if (filters.company) queryParams.append('company', filters.company);
     if (filters.page) queryParams.append('page', filters.page.toString());
@@ -121,14 +136,14 @@ export class ProductService {
       data
     );
   }
-
+  
   /**
    * Get PDFs list for a product
    */
   async getPDFs(productId: string): Promise<ApiResponse<PDF[]>> {
     return await this.apiClient.get<PDF[]>(`/products/${productId}/pdfs`);
   }
-
+  
   /**
    * Get PDF metadata
    */
