@@ -1,20 +1,42 @@
-# Exclude heavy dependencies
+# Exclude large directories not needed for the current task
 node_modules/**
+dist/**
+build/**
+.git/**
 
-# Exclude pages and components not related to the Q&A workspace section
-src/components/auth/**
-src/components/dashboard/**
+# Exclude layout and UI components not related to Q&A
 src/components/layout/**
 src/components/ui/**
 
-# Exclude the PDF and Quiz sub-sections of the workspace
+# Exclude other workspace sections not related to Q&A
 src/components/workspace/PDFSection.tsx
 src/components/workspace/QuizGroupSelector.tsx
 src/components/workspace/QuizGroupView.tsx
 src/components/workspace/QuizSection.tsx
 src/components/workspace/QuizSelectionView.tsx
 
+# Exclude dashboard components except for ProductCard which may be relevant
+src/components/dashboard/**
+!src/components/dashboard/ProductCard.tsx
+
 # Exclude development & mock data helpers
+# src/services/mockApi.ts
+# src/services/mockData/**
 
 # Exclude global context not required for Q&A focus
 src/context/**
+
+# Keep Q&A related components visible
+# src/components/workspace/QnASection.tsx
+# src/components/workspace/TopicSidebar.tsx
+# src/components/workspace/FilterBar.tsx
+# src/components/workspace/QnACard.tsx
+# src/components/workspace/VerticalView.tsx
+# src/components/workspace/HorizontalView.tsx
+# src/components/workspace/GridView.tsx
+# src/components/workspace/ViewModeSelector.tsx
+# src/components/workspace/Pagination.tsx
+# src/components/workspace/LoadingState.tsx
+# src/components/workspace/ErrorState.tsx
+# src/components/workspace/EmptyState.tsx
+# src/components/workspace/utils/qnaUtils.ts

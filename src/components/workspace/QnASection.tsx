@@ -1,14 +1,21 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
-import { Star, ChevronDown, ChevronUp, Rows, Columns, Grid3x3 } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic } from '../../types/api';
 import { TopicSidebar } from './TopicSidebar';
 import { FilterBar } from './FilterBar';
+import { ViewModeSelector, ViewMode } from './ViewModeSelector';
+import { LoadingState } from './LoadingState';
+import { ErrorState } from './ErrorState';
+import { EmptyState } from './EmptyState';
+import { Pagination } from './Pagination';
+import { VerticalView } from './VerticalView';
+import { HorizontalView } from './HorizontalView';
+import { GridView } from './GridView';
 
 interface QnASectionProps {
   productId: string;
 }
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
 export const QnASection = ({ productId }: QnASectionProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
@@ -16,9 +23,8 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<'vertical' | 'horizontal' | 'grid'>('vertical');
+  const [viewMode, setViewMode] = useState<ViewMode>('vertical');
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const horizontalScrollRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 5;
   
   // State for API data
@@ -129,22 +135,8 @@ export const QnASection = ({ productId }: QnASectionProps) => {
       
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         setCurrentItemIndex(prev => Math.min(paginatedQnA.length - 1, prev + 1));
-        if (horizontalScrollRef.current) {
-          const cardWidth = horizontalScrollRef.current.scrollWidth / paginatedQnA.length;
-          horizontalScrollRef.current.scrollTo({
-            left: cardWidth * Math.min(paginatedQnA.length - 1, currentItemIndex + 1),
-            behavior: 'smooth',
-          });
-        }
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         setCurrentItemIndex(prev => Math.max(0, prev - 1));
-        if (horizontalScrollRef.current) {
-          const cardWidth = horizontalScrollRef.current.scrollWidth / paginatedQnA.length;
-          horizontalScrollRef.current.scrollTo({
-            left: cardWidth * Math.max(0, currentItemIndex - 1),
-            behavior: 'smooth',
-          });
-        }
       }
     };
     
@@ -178,50 +170,21 @@ export const QnASection = ({ productId }: QnASectionProps) => {
     }
     setBookmarkedIds(newBookmarked);
   };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty.toLowerCase()) {
-      case 'beginner':
-        return 'bg-green-100 text-green-700';
-      case 'intermediate':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'advanced':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
+  
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedCompany('all');
+    setSelectedDifficulty('all');
   };
 
   // Show loading state
   if (loading) {
-    return (
-      <div className="p-8">
-        <div className="max-w-5xl mx-auto text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Q&A content...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
   
   // Show error state
   if (error) {
-    return (
-      <div className="p-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg mb-6">
-            <h3 className="text-lg font-medium mb-2">Error</h3>
-            <p>{error}</p>
-          </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorState error={error} onRetry={() => window.location.reload()} />;
   }
   
   return (
@@ -242,51 +205,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
               <p className="text-gray-600">Browse and search through curated interview questions</p>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm hover:shadow transition-all">
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setViewMode('vertical')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-                    viewMode === 'vertical'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                  aria-label="List view"
-                  title="List view"
-                >
-                  <Rows className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm font-medium">List</span>
-                </button>
-
-                <button
-                  onClick={() => setViewMode('horizontal')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-                    viewMode === 'horizontal'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                  aria-label="Flashcard view"
-                  title="Flashcard view"
-                >
-                  <Columns className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm font-medium">Cards</span>
-                </button>
-
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-                    viewMode === 'grid'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50'
-                  }`}
-                  aria-label="Grid view"
-                  title="Grid view"
-                >
-                  <Grid3x3 className="w-4 h-4" />
-                  <span className="hidden sm:inline text-sm font-medium">Grid</span>
-                </button>
-              </div>
-            </div>
+            <ViewModeSelector viewMode={viewMode} setViewMode={setViewMode} />
           </div>
 
           <FilterBar
@@ -327,367 +246,43 @@ export const QnASection = ({ productId }: QnASectionProps) => {
           </div>
 
         {viewMode === 'vertical' ? (
-          <div className="space-y-4">
-            {paginatedQnA.map((qna: QnA) => {
-              const isExpanded = expandedIds.has(qna.id);
-              const isBookmarked = bookmarkedIds.has(qna.id);
-
-              return (
-                <div
-                  key={qna.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-300"
-                >
-                  <div className="p-6 relative">
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900 flex-1">
-                        {qna.question}
-                      </h3>
-                      <button
-                        onClick={() => toggleBookmark(qna.id)}
-                        className="flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition"
-                      >
-                        <Star
-                          className={`w-5 h-5 ${
-                            isBookmarked ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'
-                          }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        <span
-                          className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(
-                            qna.level
-                          )}`}
-                        >
-                          {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
-                        </span>
-                        {qna.companyTags.map((company: string) => (
-                          <span
-                            key={company}
-                            className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
-                          >
-                            {company}
-                          </span>
-                        ))}
-                    </div>
-
-                    {isExpanded && (
-                      <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-4">
-                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">{qna.answer}</p>
-                        {qna.exampleCode && (
-                          <pre className="bg-gray-800 text-gray-100 text-sm p-4 rounded-lg overflow-x-auto">
-                            {qna.exampleCode}
-                          </pre>
-                        )}
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => toggleExpand(qna.id)}
-                      className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium transition"
-                    >
-                      {isExpanded ? (
-                        <>
-                          <ChevronUp className="w-5 h-5" />
-                          Hide Answer
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="w-5 h-5" />
-                          Show Answer
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <VerticalView 
+            qnas={paginatedQnA}
+            expandedIds={expandedIds}
+            bookmarkedIds={bookmarkedIds}
+            toggleExpand={toggleExpand}
+            toggleBookmark={toggleBookmark}
+          />
         ) : viewMode === 'horizontal' ? (
-          <div className="relative">
-            <div 
-              ref={horizontalScrollRef}
-              className="flex overflow-hidden snap-x snap-mandatory py-6"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {paginatedQnA.map((qna: QnA, index: number) => {
-                const isExpanded = expandedIds.has(qna.id);
-                const isBookmarked = bookmarkedIds.has(qna.id);
-
-                return (
-                  <div
-                    key={qna.id}
-                    className="flex-shrink-0 w-full snap-center px-4"
-                  >
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 h-full">
-                      <div className="p-6 flex flex-col h-full bg-gradient-to-br from-white to-gray-50">
-                        <div className="flex items-start justify-between gap-4 mb-4">
-                          <h3 className="text-lg font-semibold text-gray-900 flex-1">
-                            {qna.question}
-                          </h3>
-                          <button
-                            onClick={() => toggleBookmark(qna.id)}
-                            className="flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition"
-                          >
-                            <Star
-                              className={`w-5 h-5 ${
-                                isBookmarked ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'
-                              }`}
-                            />
-                          </button>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          <span
-                            className={`px-3 py-1 text-xs font-medium rounded-full ${
-                              getDifficultyColor(qna.level)
-                            }`}
-                          >
-                            {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
-                          </span>
-                          {qna.companyTags.map((company: string) => (
-                            <span
-                              key={company}
-                              className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
-                            >
-                              {company}
-                            </span>
-                          ))}
-                        </div>
-
-                        {isExpanded && (
-                          <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-4">
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{qna.answer}</p>
-                            {qna.exampleCode && (
-                              <pre className="bg-gray-800 text-gray-100 text-sm p-4 rounded-lg overflow-x-auto">
-                                {qna.exampleCode}
-                              </pre>
-                            )}
-                          </div>
-                        )}
-
-                        <div className="mt-auto pt-2 flex justify-between items-center">
-                          <button
-                            onClick={() => toggleExpand(qna.id)}
-                            className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium transition"
-                          >
-                            {isExpanded ? (
-                              <>
-                                <ChevronUp className="w-5 h-5" />
-                                Hide Answer
-                              </>
-                            ) : (
-                              <>
-                                <ChevronDown className="w-5 h-5" />
-                                Show Answer
-                              </>
-                            )}
-                          </button>
-                          
-                          <div className="text-sm text-gray-500">
-                            {index + 1} of {paginatedQnA.length}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-8 flex justify-center items-center gap-4">
-              <button
-                onClick={() => {
-                  setCurrentItemIndex(Math.max(0, currentItemIndex - 1));
-                  if (horizontalScrollRef.current) {
-                    const cardWidth = horizontalScrollRef.current.scrollWidth / paginatedQnA.length;
-                    horizontalScrollRef.current.scrollTo({
-                      left: cardWidth * Math.max(0, currentItemIndex - 1),
-                      behavior: 'smooth',
-                    });
-                  }
-                }}
-                disabled={currentItemIndex === 0}
-                className="px-5 py-2 bg-white border border-gray-300 rounded-lg font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                aria-label="Previous question"
-              >
-                Previous
-              </button>
-              
-              <div className="flex gap-2 bg-white py-2 px-4 rounded-lg shadow-sm border border-gray-100">
-                {paginatedQnA.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setCurrentItemIndex(index);
-                      if (horizontalScrollRef.current) {
-                        const cardWidth = horizontalScrollRef.current.scrollWidth / paginatedQnA.length;
-                        horizontalScrollRef.current.scrollTo({
-                          left: cardWidth * index,
-                          behavior: 'smooth',
-                        });
-                      }
-                    }}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${currentItemIndex === index 
-                      ? 'bg-gray-800 scale-125' 
-                      : 'bg-gray-200 hover:bg-gray-300'}`}
-                    aria-label={`Go to question ${index + 1}`}
-                  />
-                ))}
-              </div>
-              
-              <button
-                onClick={() => {
-                  setCurrentItemIndex(Math.min(paginatedQnA.length - 1, currentItemIndex + 1));
-                  if (horizontalScrollRef.current) {
-                    const cardWidth = horizontalScrollRef.current.scrollWidth / paginatedQnA.length;
-                    horizontalScrollRef.current.scrollTo({
-                      left: cardWidth * Math.min(paginatedQnA.length - 1, currentItemIndex + 1),
-                      behavior: 'smooth',
-                    });
-                  }
-                }}
-                disabled={currentItemIndex === paginatedQnA.length - 1}
-                className="px-5 py-2 bg-white border border-gray-300 rounded-lg font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-                aria-label="Next question"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <HorizontalView
+            qnas={paginatedQnA}
+            expandedIds={expandedIds}
+            bookmarkedIds={bookmarkedIds}
+            toggleExpand={toggleExpand}
+            toggleBookmark={toggleBookmark}
+            currentItemIndex={currentItemIndex}
+            setCurrentItemIndex={setCurrentItemIndex}
+          />
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {paginatedQnA.map((qna: QnA) => {
-              const isExpanded = expandedIds.has(qna.id);
-              const isBookmarked = bookmarkedIds.has(qna.id);
-
-              return (
-                <div
-                  key={qna.id}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1"
-                >
-                  <div className="p-4 flex-1 flex flex-col">
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <h3 className="text-sm font-semibold text-gray-900 flex-1 line-clamp-3">
-                        {qna.question}
-                      </h3>
-                      <button
-                        onClick={() => toggleBookmark(qna.id)}
-                        className="flex-shrink-0 p-1 hover:bg-gray-100 rounded-lg transition"
-                      >
-                        <Star
-                          className={`w-4 h-4 ${
-                            isBookmarked ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'
-                          }`}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      <span
-                        className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                          getDifficultyColor(qna.level)
-                        }`}
-                      >
-                        {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
-                      </span>
-                      {qna.companyTags.slice(0, 1).map((company: string) => (
-                        <span
-                          key={company}
-                          className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
-                        >
-                          {company}
-                        </span>
-                      ))}
-                      {qna.companyTags.length > 1 && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
-                          +{qna.companyTags.length - 1}
-                        </span>
-                      )}
-                    </div>
-
-                    {isExpanded && (
-                      <div className="mb-2 p-3 bg-gray-50 rounded-lg flex-1 overflow-auto max-h-32">
-                        <p className="text-xs text-gray-700 leading-relaxed line-clamp-6">{qna.answer}</p>
-                      </div>
-                    )}
-
-                    <div className="mt-auto pt-2 border-t border-gray-100">
-                      <button
-                        onClick={() => toggleExpand(qna.id)}
-                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium transition w-full justify-center py-1"
-                      >
-                        {isExpanded ? (
-                          <>
-                            <ChevronUp className="w-3 h-3" />
-                            Hide
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="w-3 h-3" />
-                            Show Answer
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <GridView
+            qnas={paginatedQnA}
+            expandedIds={expandedIds}
+            bookmarkedIds={bookmarkedIds}
+            toggleExpand={toggleExpand}
+            toggleBookmark={toggleBookmark}
+          />
         ) : null}
 
         {viewMode !== 'horizontal' && totalPages > 1 && (
-          <div className="mt-8 flex justify-center gap-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              Previous
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-4 py-2 rounded-lg transition ${
-                  currentPage === page
-                    ? 'bg-blue-600 text-white'
-                    : 'border border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              Next
-            </button>
-          </div>
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+          />
         )}
-
-        {/* Custom CSS for hiding scrollbars is applied via Tailwind classes */}
         
         {filteredQnA.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">No questions found matching your filters</p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCompany('all');
-                setSelectedDifficulty('all');
-              }}
-              className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Clear all filters
-            </button>
-          </div>
+          <EmptyState onClearFilters={handleClearFilters} />
         )}
         </main>
       </div>
