@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Star, ChevronDown, ChevronUp, Building2, TrendingUp, BookOpen, Rows } from 'lucide-react';
+import { Search, Star, ChevronDown, ChevronUp, Building2, TrendingUp, BookOpen, Rows, Columns } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic } from '../../types/api';
 
@@ -224,26 +224,68 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   
   return (
     <div className="p-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Q&A Repository</h1>
-            <p className="text-gray-600">Browse and search through curated interview questions</p>
+      <div className="flex gap-8">
+        {/* Topic sidebar */}
+        <aside className="hidden md:block w-60 shrink-0">
+          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            {topics.map((topic) => {
+              const isActive = topic.id === selectedTopicId;
+              return (
+                <button
+                  key={topic.id}
+                  onClick={() => {
+                    setSelectedTopicId(topic.id);
+                    setCurrentPage(1);
+                  }}
+                  className={`w-full text-left px-4 py-3 text-sm transition border-b border-gray-200 last:border-b-0 ${isActive ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:bg-gray-50 text-gray-700'}`}
+                >
+                  {topic.name}
+                </button>
+              );
+            })}
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm hover:shadow transition-all">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setViewMode('vertical')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${viewMode === 'vertical' ? 'bg-gray-200 text-gray-800 font-medium shadow-sm' : 'text-gray-600 hover:bg-gray-50'}`}
-                aria-label="Vertical list view"
-                title="Vertical list view"
-              >
-                <Rows className="w-5 h-5" />
-                <span className="hidden sm:inline">List</span>
-              </button>
+        </aside>
+        <main className="flex-1 max-w-5xl">
+          <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Q&A Repository</h1>
+              <p className="text-gray-600">Browse and search through curated interview questions</p>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm hover:shadow transition-all">
+              <div className="flex items-center gap-1">
+                {/* List view */}
+                <button
+                  onClick={() => setViewMode('vertical')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                    viewMode === 'vertical'
+                      ? 'bg-gray-200 text-gray-800 font-medium shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  aria-label="Vertical list view"
+                  title="Vertical list view"
+                >
+                  <Rows className="w-5 h-5" />
+                  <span className="hidden sm:inline">List</span>
+                </button>
+
+                {/* Flash-card view */}
+                <button
+                  onClick={() => setViewMode('horizontal')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                    viewMode === 'horizontal'
+                      ? 'bg-gray-200 text-gray-800 font-medium shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  aria-label="Flash-card view"
+                  title="Flash-card view"
+                >
+                  <Columns className="w-5 h-5" />
+                  <span className="hidden sm:inline">Flash&nbsp;Cards</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
@@ -685,6 +727,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
             </button>
           </div>
         )}
+        </main>
       </div>
     </div>
   );
