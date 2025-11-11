@@ -28,6 +28,7 @@ import {
   QuizGroup,
   Quiz,
   PDF,
+  Flashcard,
   QuizSubmitRequest,
   QuizSubmitResponse
 } from '../types/api';
@@ -295,6 +296,20 @@ export class APIService {
       return mockProductApi.getPDFDetail(productId, pdfId);
     }
     return this.productService.getPDFDetail(productId, pdfId);
+  }
+
+  async getFlashcards(productId: string): Promise<ApiResponse<Flashcard[]>> {
+    if (USE_MOCK_API) {
+      return mockProductApi.getFlashcards(productId);
+    }
+    return this.productService.getFlashcards(productId);
+  }
+
+  async updateFlashcardProgress(productId: string, flashcardId: string, mastered: boolean): Promise<ApiResponse<Flashcard>> {
+    if (USE_MOCK_API) {
+      return mockProductApi.updateFlashcardProgress(productId, flashcardId, mastered);
+    }
+    return this.productService.updateFlashcardProgress(productId, flashcardId, mastered);
   }
 
   // Admin methods can be added as needed

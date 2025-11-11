@@ -3,14 +3,11 @@ import { apiService } from '../../services/apiService';
 import { QnA, Topic } from '../../types/api';
 import { TopicSidebar } from './TopicSidebar';
 import { FilterBar } from './FilterBar';
-import { ViewModeSelector, ViewMode } from './ViewModeSelector';
 import { LoadingState } from './LoadingState';
 import { ErrorState } from './ErrorState';
 import { EmptyState } from './EmptyState';
 import { Pagination } from './Pagination';
-import { VerticalView } from './VerticalView';
-import { HorizontalView } from './HorizontalView';
-import { GridView } from './GridView';
+import { CardView } from './CardView';
 
 interface QnASectionProps {
   productId: string;
@@ -23,8 +20,6 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<ViewMode>('vertical');
-  const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const itemsPerPage = 5;
   
   // State for API data
@@ -128,27 +123,6 @@ export const QnASection = ({ productId }: QnASectionProps) => {
     currentPage * itemsPerPage
   );
   
-  // Add keyboard navigation for horizontal view
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (viewMode !== 'horizontal') return;
-      
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        setCurrentItemIndex(prev => Math.min(paginatedQnA.length - 1, prev + 1));
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        setCurrentItemIndex(prev => Math.max(0, prev - 1));
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [viewMode, currentItemIndex, paginatedQnA.length]);
-  
-  // Reset current item index when changing view modes
-  useEffect(() => {
-    setCurrentItemIndex(0);
-  }, [viewMode]);
-
   const toggleExpand = (id: string) => {
     setExpandedIds(prev => {
       const next = new Set(prev);
@@ -199,13 +173,11 @@ export const QnASection = ({ productId }: QnASectionProps) => {
           }}
         />
         <main className="flex-1 max-w-6xl">
-          <div className="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div className="mb-6">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Q&A Repository</h1>
               <p className="text-gray-600">Browse and search through curated interview questions</p>
             </div>
-
-            <ViewModeSelector viewMode={viewMode} setViewMode={setViewMode} />
           </div>
 
           <FilterBar
@@ -245,35 +217,15 @@ export const QnASection = ({ productId }: QnASectionProps) => {
             )}
           </div>
 
-        {viewMode === 'vertical' ? (
-          <VerticalView 
+        <CardView 
             qnas={paginatedQnA}
             expandedIds={expandedIds}
             bookmarkedIds={bookmarkedIds}
             toggleExpand={toggleExpand}
             toggleBookmark={toggleBookmark}
           />
-        ) : viewMode === 'horizontal' ? (
-          <HorizontalView
-            qnas={paginatedQnA}
-            expandedIds={expandedIds}
-            bookmarkedIds={bookmarkedIds}
-            toggleExpand={toggleExpand}
-            toggleBookmark={toggleBookmark}
-            currentItemIndex={currentItemIndex}
-            setCurrentItemIndex={setCurrentItemIndex}
-          />
-        ) : viewMode === 'grid' ? (
-          <GridView
-            qnas={paginatedQnA}
-            expandedIds={expandedIds}
-            bookmarkedIds={bookmarkedIds}
-            toggleExpand={toggleExpand}
-            toggleBookmark={toggleBookmark}
-          />
-        ) : null}
 
-        {viewMode !== 'horizontal' && totalPages > 1 && (
+        {totalPages > 1 && (
           <Pagination 
             currentPage={currentPage} 
             totalPages={totalPages} 

@@ -11,6 +11,7 @@ import {
   QuizGroup,
   Quiz,
   PDF,
+  Flashcard,
   Bookmark,
   Progress,
   QuizAttempt,
@@ -32,6 +33,7 @@ import {
   mockQuizAttempts,
   mockUserStats
 } from './mockData';
+import { mockFlashcards } from '../data/mockData';
 
 // Helper function to create API responses
 function createResponse<T>(data: T, message: string = 'Success'): ApiResponse<T> {
@@ -548,6 +550,34 @@ export const mockProductApi = {
     }
     
     return createResponse(pdf);
+  },
+
+  getFlashcards: async (productId: string): Promise<ApiResponse<Flashcard[]>> => {
+    await delay();
+    
+    const productFlashcards = mockFlashcards.filter((flashcard: Flashcard) => flashcard.productId === productId);
+    
+    return createResponse(productFlashcards);
+  },
+
+  updateFlashcardProgress: async (productId: string, flashcardId: string, mastered: boolean): Promise<ApiResponse<Flashcard>> => {
+    await delay();
+    
+    const flashcard = mockFlashcards.find((fc: Flashcard) => fc.id === flashcardId && fc.productId === productId);
+    
+    if (!flashcard) {
+      throw new Error('Flashcard not found');
+    }
+    
+    // Update the flashcard
+    const updatedFlashcard = {
+      ...flashcard,
+      mastered,
+      lastReviewed: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    return createResponse(updatedFlashcard, 'Flashcard progress updated');
   }
 };
 

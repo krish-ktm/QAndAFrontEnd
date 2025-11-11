@@ -46,6 +46,20 @@ export interface PDF {
   bookmarked: boolean;
 }
 
+export interface Flashcard {
+  id: string;
+  productId: string;
+  topicId: string;
+  front: string;
+  back: string;
+  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  category: string;
+  mastered: boolean;
+  lastReviewed?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface MockUserWithCredentials extends User {
   password: string;
 }
@@ -251,5 +265,104 @@ export const mockPDFs: PDF[] = [
     title: 'STAR Method Framework',
     url: '#',
     bookmarked: false,
+  },
+];
+
+export const mockFlashcards: Flashcard[] = [
+  {
+    id: 'fc1',
+    productId: '1',
+    topicId: 't1',
+    front: 'What is the time complexity of binary search?',
+    back: 'O(log n) - Binary search divides the search space in half with each comparison.',
+    difficulty: 'BEGINNER',
+    category: 'Algorithms',
+    mastered: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc2',
+    productId: '1',
+    topicId: 't1',
+    front: 'Explain the concept of memoization',
+    back: 'Memoization is an optimization technique where you store the results of expensive function calls and return the cached result when the same inputs occur again.',
+    difficulty: 'INTERMEDIATE',
+    category: 'Dynamic Programming',
+    mastered: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc3',
+    productId: '1',
+    topicId: 't2',
+    front: 'What is the difference between a stack and a queue?',
+    back: 'Stack follows LIFO (Last In First Out) principle, while Queue follows FIFO (First In First Out) principle.',
+    difficulty: 'BEGINNER',
+    category: 'Data Structures',
+    mastered: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc4',
+    productId: '1',
+    topicId: 't2',
+    front: 'How does a hash table handle collisions?',
+    back: 'Common collision resolution techniques include: 1) Chaining (linked lists), 2) Open addressing (linear/quadratic probing), 3) Double hashing.',
+    difficulty: 'INTERMEDIATE',
+    category: 'Data Structures',
+    mastered: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc5',
+    productId: '2',
+    topicId: 't3',
+    front: 'What is the CAP theorem?',
+    back: 'CAP theorem states that a distributed system can only guarantee two out of three properties: Consistency, Availability, and Partition Tolerance.',
+    difficulty: 'ADVANCED',
+    category: 'Distributed Systems',
+    mastered: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc6',
+    productId: '2',
+    topicId: 't3',
+    front: 'What is horizontal scaling?',
+    back: 'Horizontal scaling means adding more machines to your pool of resources to handle increased load, also known as scaling out.',
+    difficulty: 'INTERMEDIATE',
+    category: 'System Design',
+    mastered: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc7',
+    productId: '1',
+    topicId: 't1',
+    front: 'What is the difference between DFS and BFS?',
+    back: 'DFS (Depth First Search) explores as far as possible along each branch before backtracking. BFS (Breadth First Search) explores all neighbors at the present depth before moving to the next level.',
+    difficulty: 'INTERMEDIATE',
+    category: 'Graph Algorithms',
+    mastered: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'fc8',
+    productId: '1',
+    topicId: 't2',
+    front: 'What is a balanced binary tree?',
+    back: 'A balanced binary tree is a binary tree where the height of the left and right subtrees of any node differ by at most one, ensuring O(log n) operations.',
+    difficulty: 'INTERMEDIATE',
+    category: 'Data Structures',
+    mastered: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 ];

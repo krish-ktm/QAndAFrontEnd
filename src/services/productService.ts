@@ -7,6 +7,7 @@ import {
   QuizGroup,
   Quiz,
   PDF,
+  Flashcard,
   PaginatedResponse,
   QuizSubmitRequest,
   QuizSubmitResponse
@@ -149,5 +150,22 @@ export class ProductService {
    */
   async getPDFDetail(productId: string, pdfId: string): Promise<ApiResponse<PDF>> {
     return await this.apiClient.get<PDF>(`/products/${productId}/pdfs/${pdfId}`);
+  }
+
+  /**
+   * Get flashcards for a product
+   */
+  async getFlashcards(productId: string): Promise<ApiResponse<Flashcard[]>> {
+    return await this.apiClient.get<Flashcard[]>(`/products/${productId}/flashcards`);
+  }
+
+  /**
+   * Update flashcard progress (mastered status)
+   */
+  async updateFlashcardProgress(productId: string, flashcardId: string, mastered: boolean): Promise<ApiResponse<Flashcard>> {
+    return await this.apiClient.put<Flashcard>(
+      `/products/${productId}/flashcards/${flashcardId}/progress`, 
+      { mastered }
+    );
   }
 }

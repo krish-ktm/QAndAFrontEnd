@@ -176,6 +176,20 @@ export interface PDF {
   updatedAt: string;
 }
 
+export interface Flashcard {
+  id: string;
+  productId: string;
+  topicId: string;
+  front: string;
+  back: string;
+  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  category: string;
+  mastered: boolean;
+  lastReviewed?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Admin Types
 export interface UserProductAccess {
   userId: string;
