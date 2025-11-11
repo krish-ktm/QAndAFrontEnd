@@ -1,10 +1,9 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Star, ChevronDown, ChevronUp, Rows, Columns } from 'lucide-react';
+import { Star, ChevronDown, ChevronUp, Rows, Columns, Grid3x3 } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic } from '../../types/api';
 import { TopicSidebar } from './TopicSidebar';
 import { FilterBar } from './FilterBar';
-import { QnACardVertical } from './QnACardVertical';
 
 interface QnASectionProps {
   productId: string;
@@ -226,8 +225,8 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   }
   
   return (
-    <div className="p-8">
-      <div className="flex gap-8">
+    <div className="p-6 lg:p-8">
+      <div className="flex gap-6 lg:gap-8">
         <TopicSidebar
           topics={topics}
           selectedTopicId={selectedTopicId}
@@ -236,150 +235,96 @@ export const QnASection = ({ productId }: QnASectionProps) => {
             setCurrentPage(1);
           }}
         />
-        <main className="flex-1 max-w-5xl">
-          <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <main className="flex-1 max-w-6xl">
+          <div className="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Q&A Repository</h1>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Q&A Repository</h1>
               <p className="text-gray-600">Browse and search through curated interview questions</p>
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm hover:shadow transition-all">
               <div className="flex items-center gap-1">
-                {/* List view */}
                 <button
                   onClick={() => setViewMode('vertical')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
                     viewMode === 'vertical'
-                      ? 'bg-gray-200 text-gray-800 font-medium shadow-sm'
+                      ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
-                  aria-label="Vertical list view"
-                  title="Vertical list view"
+                  aria-label="List view"
+                  title="List view"
                 >
-                  <Rows className="w-5 h-5" />
-                  <span className="hidden sm:inline">List</span>
+                  <Rows className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm font-medium">List</span>
                 </button>
 
-                {/* Flash-card view */}
                 <button
                   onClick={() => setViewMode('horizontal')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
                     viewMode === 'horizontal'
-                      ? 'bg-gray-200 text-gray-800 font-medium shadow-sm'
+                      ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-600 hover:bg-gray-50'
                   }`}
-                  aria-label="Flash-card view"
-                  title="Flash-card view"
+                  aria-label="Flashcard view"
+                  title="Flashcard view"
                 >
-                  <Columns className="w-5 h-5" />
-                  <span className="hidden sm:inline">Flash&nbsp;Cards</span>
+                  <Columns className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm font-medium">Cards</span>
+                </button>
+
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                    viewMode === 'grid'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                  aria-label="Grid view"
+                  title="Grid view"
+                >
+                  <Grid3x3 className="w-4 h-4" />
+                  <span className="hidden sm:inline text-sm font-medium">Grid</span>
                 </button>
               </div>
             </div>
           </div>
 
-        <FilterBar
-          searchQuery={searchQuery}
-          onSearch={(val) => {
-            setSearchQuery(val);
-            setCurrentPage(1);
-          }}
-          topics={topics}
-          selectedTopicId={selectedTopicId}
-          onTopicChange={(val) => {
-            setSelectedTopicId(val);
-            setCurrentPage(1);
-          }}
-          companies={allCompanies}
-          selectedCompany={selectedCompany}
-          onCompanyChange={(val) => {
-            setSelectedCompany(val);
-            setCurrentPage(1);
-          }}
-          selectedDifficulty={selectedDifficulty}
-          onDifficultyChange={(val) => {
-            setSelectedDifficulty(val);
-            setCurrentPage(1);
-          }}
-        />
-        <div className="text-sm text-gray-600 mb-6">
-          Showing {filteredQnA.length} question{filteredQnA.length !== 1 ? 's' : ''}
-        </div>
-          {/* Duplicate filter bar removed */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search questions or answers..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+          <FilterBar
+            searchQuery={searchQuery}
+            onSearch={(val) => {
+              setSearchQuery(val);
+              setCurrentPage(1);
+            }}
+            topics={topics}
+            selectedTopicId={selectedTopicId}
+            onTopicChange={(val) => {
+              setSelectedTopicId(val);
+              setCurrentPage(1);
+            }}
+            companies={allCompanies}
+            selectedCompany={selectedCompany}
+            onCompanyChange={(val) => {
+              setSelectedCompany(val);
+              setCurrentPage(1);
+            }}
+            selectedDifficulty={selectedDifficulty}
+            onDifficultyChange={(val) => {
+              setSelectedDifficulty(val);
+              setCurrentPage(1);
+            }}
+          />
+
+          <div className="flex items-center justify-between mb-6">
+            <div className="text-sm text-gray-600">
+              Showing <span className="font-semibold text-gray-900">{filteredQnA.length}</span> question{filteredQnA.length !== 1 ? 's' : ''}
             </div>
 
-            <div className="flex gap-3">
-              <div className="relative">
-                <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <select
-                  value={selectedTopicId}
-                  onChange={(e) => {
-                    setSelectedTopicId(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                >
-                  {topics.map((topic: Topic) => (
-                    <option key={topic.id} value={topic.id}>
-                      {topic.name}
-                    </option>
-                  ))}
-                </select>
+            {filteredQnA.length > 0 && (
+              <div className="text-xs text-gray-500">
+                Page {currentPage} of {totalPages}
               </div>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <select
-                  value={selectedCompany}
-                  onChange={(e) => {
-                    setSelectedCompany(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                >
-                  <option value="all">All Companies</option>
-                  {allCompanies.map((company) => (
-                    <option key={company} value={company}>
-                      {company}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="relative">
-                <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => {
-                    setSelectedDifficulty(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                >
-                  <option value="all">All Levels</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
-            </div>
+            )}
           </div>
-
-          <div className="mt-4 text-sm text-gray-600">
-            Showing {filteredQnA.length} question{filteredQnA.length !== 1 ? 's' : ''}
-          </div>
-        </div>
 
         {viewMode === 'vertical' ? (
           <div className="space-y-4">
@@ -611,8 +556,8 @@ export const QnASection = ({ productId }: QnASectionProps) => {
               </button>
             </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedQnA.map((qna: QnA) => {
               const isExpanded = expandedIds.has(qna.id);
               const isBookmarked = bookmarkedIds.has(qna.id);
@@ -620,16 +565,16 @@ export const QnASection = ({ productId }: QnASectionProps) => {
               return (
                 <div
                   key={qna.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:border-gray-300 transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1"
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-200 transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1"
                 >
-                  <div className="p-5 flex-1 flex flex-col bg-gradient-to-br from-white to-gray-50/30">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <h3 className="text-base font-semibold text-gray-900 flex-1 line-clamp-2">
+                  <div className="p-4 flex-1 flex flex-col">
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <h3 className="text-sm font-semibold text-gray-900 flex-1 line-clamp-3">
                         {qna.question}
                       </h3>
                       <button
                         onClick={() => toggleBookmark(qna.id)}
-                        className="flex-shrink-0 p-1.5 hover:bg-gray-100 rounded-lg transition"
+                        className="flex-shrink-0 p-1 hover:bg-gray-100 rounded-lg transition"
                       >
                         <Star
                           className={`w-4 h-4 ${
@@ -639,48 +584,48 @@ export const QnASection = ({ productId }: QnASectionProps) => {
                       </button>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 mb-3">
+                    <div className="flex flex-wrap gap-1.5 mb-2">
                       <span
-                        className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                        className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                           getDifficultyColor(qna.level)
                         }`}
                       >
                         {qna.level.charAt(0) + qna.level.slice(1).toLowerCase()}
                       </span>
-                      {qna.companyTags.slice(0, 2).map((company: string) => (
+                      {qna.companyTags.slice(0, 1).map((company: string) => (
                         <span
                           key={company}
-                          className="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
+                          className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
                         >
                           {company}
                         </span>
                       ))}
-                      {qna.companyTags.length > 2 && (
-                        <span className="px-2.5 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
-                          +{qna.companyTags.length - 2} more
+                      {qna.companyTags.length > 1 && (
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                          +{qna.companyTags.length - 1}
                         </span>
                       )}
                     </div>
 
                     {isExpanded && (
-                      <div className="mb-3 p-3 bg-gray-50 rounded-lg flex-1 overflow-auto max-h-40">
-                        <p className="text-sm text-gray-700 leading-relaxed">{qna.answer}</p>
+                      <div className="mb-2 p-3 bg-gray-50 rounded-lg flex-1 overflow-auto max-h-32">
+                        <p className="text-xs text-gray-700 leading-relaxed line-clamp-6">{qna.answer}</p>
                       </div>
                     )}
 
-                    <div className="mt-auto pt-2">
+                    <div className="mt-auto pt-2 border-t border-gray-100">
                       <button
                         onClick={() => toggleExpand(qna.id)}
-                        className="flex items-center gap-1.5 text-sm text-gray-700 hover:text-gray-900 font-medium transition"
+                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium transition w-full justify-center py-1"
                       >
                         {isExpanded ? (
                           <>
-                            <ChevronUp className="w-4 h-4" />
-                            Hide Answer
+                            <ChevronUp className="w-3 h-3" />
+                            Hide
                           </>
                         ) : (
                           <>
-                            <ChevronDown className="w-4 h-4" />
+                            <ChevronDown className="w-3 h-3" />
                             Show Answer
                           </>
                         )}
@@ -691,7 +636,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
               );
             })}
           </div>
-        )}
+        ) : null}
 
         {viewMode !== 'horizontal' && totalPages > 1 && (
           <div className="mt-8 flex justify-center gap-2">
