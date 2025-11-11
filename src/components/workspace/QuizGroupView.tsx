@@ -13,7 +13,7 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
   const [quizGroups, setQuizGroups] = useState<QuizGroup[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [clickedId, setClickedId] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   
   useEffect(() => {
     const fetchQuizGroups = async () => {
@@ -37,11 +37,8 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
   }, [productId]);
   
   const handleQuizGroupClick = (quizGroup: QuizGroup) => {
-    setClickedId(quizGroup.id);
-    setTimeout(() => {
-      onSelectQuizGroup(quizGroup);
-      setClickedId(null);
-    }, 300);
+    setSelectedGroupId(quizGroup.id);
+    onSelectQuizGroup(quizGroup);
   };
   
   if (loading) {
@@ -89,8 +86,8 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
               animate={{ 
                 opacity: 1, 
                 y: 0,
-                scale: clickedId === quizGroup.id ? 0.95 : 1,
-                backgroundColor: clickedId === quizGroup.id ? '#f0f9ff' : '#ffffff'
+                scale: selectedGroupId === quizGroup.id ? 0.95 : 1,
+                backgroundColor: selectedGroupId === quizGroup.id ? '#f0f9ff' : '#ffffff'
               }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
               whileHover={{ 
@@ -133,15 +130,23 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
                     </div>
                   </div>
                   
-                  <motion.div 
-                    className="ml-4 flex-shrink-0"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                      <ArrowRight className="w-5 h-5" />
+                  {selectedGroupId === quizGroup.id ? (
+                    <div className="ml-4 flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-600"></div>
+                      </div>
                     </div>
-                  </motion.div>
+                  ) : (
+                    <motion.div 
+                      className="ml-4 flex-shrink-0"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <ArrowRight className="w-5 h-5" />
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </motion.div>

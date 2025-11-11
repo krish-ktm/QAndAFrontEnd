@@ -431,7 +431,6 @@ export const mockProductApi = {
       limit?: number;
     } = {}
   ): Promise<ApiResponse<PaginatedResponse<Quiz>>> => {
-    await delay();
     
     // Get quiz groups for this product
     const productQuizGroupIds = mockQuizGroups
