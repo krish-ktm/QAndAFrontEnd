@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, RotateCcw, Trophy, ArrowLeft } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Quiz, QuizGroup } from '../../types/api';
-import { QuizSelectionView } from './QuizSelectionView';
 import { QuizGroupView } from './QuizGroupView';
 
 interface QuizSectionProps {
@@ -17,7 +16,7 @@ interface LocalQuizAttempt {
 
 export const QuizSection = ({ productId }: QuizSectionProps) => {
   // Flow state
-  const [view, setView] = useState<'groups' | 'quizzes' | 'active'>('groups');
+  const [view, setView] = useState<'groups' | 'active'>('groups');
   const [selectedQuizGroup, setSelectedQuizGroup] = useState<QuizGroup | null>(null);
   
   // Quiz state
@@ -29,16 +28,39 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Handle quiz group selection
-  const handleSelectQuizGroup = (quizGroup: QuizGroup) => {
-    setSelectedQuizGroup(quizGroup);
-    setView('quizzes');
+  // Handle quiz group selection - directly start quizzes for the selected group
+  const handleSelectQuizGroup = async (quizGroup: QuizGroup) => {
+    try {
+      setLoading(true);
+      const response = await apiService.getQuizzes(productId, { quizGroupId: quizGroup.id });
+      if (response.success) {
+        setSelectedQuizGroup(quizGroup);
+        setQuizzes(response.data.items);
+        setCurrentQuizIndex(0);
+        setSelectedAnswer(null);
+        setShowResult(false);
+        setAttempts([]);
+        setView('active');
+      } else {
+        setError(response.message || 'Failed to load quizzes');
+      }
+    } catch (err) {
+      console.error('Error fetching quizzes for group:', err);
+      setError('An error occurred while loading quizzes');
+    } finally {
+      setLoading(false);
+    }
   };
   
   // Handle going back to quiz groups
   const handleBackToGroups = () => {
     setView('groups');
     setSelectedQuizGroup(null);
+    setQuizzes([]);
+    setCurrentQuizIndex(0);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setAttempts([]);
   };
   
   // Handle quiz selection
@@ -55,14 +77,6 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
     setQuizzes(allQuizzes || [quiz]);
   };
   
-  // Handle going back to quiz selection
-  const handleBackToQuizzes = () => {
-    setView('quizzes');
-    setCurrentQuizIndex(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setAttempts([]);
-  };
   
   const currentQuiz = quizzes[currentQuizIndex];
   const isLastQuiz = currentQuizIndex === quizzes.length - 1;
@@ -159,16 +173,6 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
     return <QuizGroupView productId={productId} onSelectQuizGroup={handleSelectQuizGroup} />;
   }
   
-  if (view === 'quizzes' && selectedQuizGroup) {
-    return (
-      <QuizSelectionView 
-        productId={productId} 
-        quizGroup={selectedQuizGroup}
-        onSelectQuiz={handleSelectQuiz} 
-        onBackToQuizGroups={handleBackToGroups}
-      />
-    );
-  }
 
   if (error) {
     return (
@@ -280,11 +284,11 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <button
-          onClick={handleBackToQuizzes}
+          onClick={handleBackToGroups}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="font-medium">Back to Quiz Selection</span>
+          <span className="font-medium">Back to Quiz Groups</span>
         </button>
         
         <div className="mb-6">
