@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter, ChevronDown } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Flashcard, Topic } from '../../types/api';
 import { FlashcardCard } from './FlashcardCard';
@@ -169,40 +169,30 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
           <p className="text-gray-600">Test your knowledge with interactive flashcards</p>
         </div>
 
-        {/* Topic Filter */}
+        {/* Topic Filter - Now simplified */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="w-4 h-4 text-gray-500" />
             <label className="text-sm font-medium text-gray-700">Filter by Topic:</label>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedTopicId('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedTopicId === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
+          <div className="relative max-w-xs">
+            <select
+              value={selectedTopicId}
+              onChange={(e) => setSelectedTopicId(e.target.value)}
+              className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-sm font-medium"
             >
-              All Topics ({flashcards.length})
-            </button>
-            {topics.map((topic) => {
-              const count = flashcards.filter(fc => fc.topicId === topic.id).length;
-              if (count === 0) return null;
-              return (
-                <button
-                  key={topic.id}
-                  onClick={() => setSelectedTopicId(topic.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedTopicId === topic.id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  {topic.name} ({count})
-                </button>
-              );
-            })}
+              <option value="all">All Topics ({flashcards.length})</option>
+              {topics.map((topic) => {
+                const count = flashcards.filter(fc => fc.topicId === topic.id).length;
+                if (count === 0) return null;
+                return (
+                  <option key={topic.id} value={topic.id}>
+                    {topic.name} ({count})
+                  </option>
+                );
+              })}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
 

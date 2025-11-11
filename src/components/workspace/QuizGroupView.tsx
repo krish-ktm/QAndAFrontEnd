@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Book, ArrowRight, BarChart2, Clock } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QuizGroup } from '../../types/api';
@@ -12,6 +13,7 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
   const [quizGroups, setQuizGroups] = useState<QuizGroup[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [clickedId, setClickedId] = useState<string | null>(null);
   
   useEffect(() => {
     const fetchQuizGroups = async () => {
@@ -33,6 +35,14 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
     
     fetchQuizGroups();
   }, [productId]);
+  
+  const handleQuizGroupClick = (quizGroup: QuizGroup) => {
+    setClickedId(quizGroup.id);
+    setTimeout(() => {
+      onSelectQuizGroup(quizGroup);
+      setClickedId(null);
+    }, 300);
+  };
   
   if (loading) {
     return (
@@ -72,11 +82,27 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Select a Quiz Group</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {quizGroups.map((quizGroup) => (
-            <div
+          {quizGroups.map((quizGroup, index) => (
+            <motion.div
               key={quizGroup.id}
-              className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition cursor-pointer"
-              onClick={() => onSelectQuizGroup(quizGroup)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                scale: clickedId === quizGroup.id ? 0.95 : 1,
+                backgroundColor: clickedId === quizGroup.id ? '#f0f9ff' : '#ffffff'
+              }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              whileHover={{ 
+                scale: 1.02,
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+              whileTap={{ 
+                scale: 0.98,
+                boxShadow: "0 5px 15px -3px rgba(0, 0, 0, 0.1), 0 5px 8px -2px rgba(0, 0, 0, 0.04)"
+              }}
+              className="bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer relative"
+              onClick={() => handleQuizGroupClick(quizGroup)}
             >
               <div className="p-6">
                 <div className="flex items-start justify-between">
@@ -107,14 +133,18 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
                     </div>
                   </div>
                   
-                  <div className="ml-4 flex-shrink-0">
+                  <motion.div 
+                    className="ml-4 flex-shrink-0"
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                       <ArrowRight className="w-5 h-5" />
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

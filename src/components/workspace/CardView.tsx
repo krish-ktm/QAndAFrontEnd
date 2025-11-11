@@ -1,4 +1,4 @@
-import { Star, ChevronDown, ChevronUp, Clock, TrendingUp } from 'lucide-react';
+import { Star, ChevronDown, ChevronUp, Clock, TrendingUp, Loader2 } from 'lucide-react';
 import { QnA } from '../../types/api';
 import { getDifficultyColor, formatDifficulty } from './utils/qnaUtils';
 
@@ -8,6 +8,7 @@ interface CardViewProps {
   bookmarkedIds: Set<string>;
   toggleExpand: (id: string) => void;
   toggleBookmark: (id: string) => void;
+  isLoading?: boolean;
 }
 
 export const CardView = ({ 
@@ -15,8 +16,54 @@ export const CardView = ({
   expandedIds, 
   bookmarkedIds, 
   toggleExpand, 
-  toggleBookmark 
+  toggleBookmark,
+  isLoading = false
 }: CardViewProps) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-5">
+              <div className="animate-pulse">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                      <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  </div>
+                  <div className="w-9 h-9 bg-gray-200 rounded-lg"></div>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+                  <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                  <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+                </div>
+                
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-gray-200 rounded"></div>
+                    <div className="h-3 w-12 bg-gray-200 rounded"></div>
+                  </div>
+                  <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+          <span className="ml-2 text-sm text-gray-600">Loading questions...</span>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="space-y-4">
       {qnas.map((qna: QnA) => {

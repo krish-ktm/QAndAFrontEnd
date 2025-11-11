@@ -14,7 +14,6 @@ interface QnASectionProps {
 }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 export const QnASection = ({ productId }: QnASectionProps) => {
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -25,7 +24,6 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   // State for API data
   const [topics, setTopics] = useState<Topic[]>([]);
   const [qnas, setQnas] = useState<QnA[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
   // Fetch topics for the product
@@ -52,13 +50,14 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   
   // Selected topic
   const [selectedTopicId, setSelectedTopicId] = useState<string>('');
+  const [loadingTopicId, setLoadingTopicId] = useState<string>('');
   
   // Fetch QnAs for the selected topic
   useEffect(() => {
     if (!selectedTopicId) return;
     
     const fetchQnAs = async () => {
-      setLoading(true);
+      setLoadingTopicId(selectedTopicId);
       try {
         const response = await apiService.getQnA(productId, { topicId: selectedTopicId });
         if (response.success) {
@@ -80,7 +79,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
         console.error('Error fetching Q&As:', err);
         setError('An error occurred while loading Q&As');
       } finally {
-        setLoading(false);
+        setLoadingTopicId('');
       }
     };
     
@@ -100,11 +99,6 @@ export const QnASection = ({ productId }: QnASectionProps) => {
 
   const filteredQnA = useMemo(() => {
     return productQnA.filter((qna) => {
-      const matchesSearch =
-        searchQuery === '' ||
-        qna.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        qna.answer.toLowerCase().includes(searchQuery.toLowerCase());
-
       const matchesCompany =
         selectedCompany === 'all' || qna.companyTags.includes(selectedCompany);
 
@@ -113,9 +107,9 @@ export const QnASection = ({ productId }: QnASectionProps) => {
       const matchesDifficulty =
         selectedDifficulty === 'all' || qnaLevel === selectedDifficulty.toLowerCase();
 
-      return matchesSearch && matchesCompany && matchesDifficulty;
+      return matchesCompany && matchesDifficulty;
     });
-  }, [productQnA, searchQuery, selectedCompany, selectedDifficulty]);
+  }, [productQnA, selectedCompany, selectedDifficulty]);
 
   const totalPages = Math.ceil(filteredQnA.length / itemsPerPage);
   const paginatedQnA = filteredQnA.slice(
@@ -146,19 +140,18 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   };
   
   const handleClearFilters = () => {
-    setSearchQuery('');
     setSelectedCompany('all');
     setSelectedDifficulty('all');
   };
 
-  // Show loading state
-  if (loading) {
-    return <LoadingState />;
-  }
-  
   // Show error state
   if (error) {
     return <ErrorState error={error} onRetry={() => window.location.reload()} />;
+  }
+  
+  // Show loading state while topics are being fetched
+  if (topics.length === 0 && !error) {
+    return <LoadingState />;
   }
   
   return (
@@ -176,22 +169,11 @@ export const QnASection = ({ productId }: QnASectionProps) => {
           <div className="mb-6">
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Q&A Repository</h1>
-              <p className="text-gray-600">Browse and search through curated interview questions</p>
+              <p className="text-gray-600">Browse through curated interview questions by topic</p>
             </div>
           </div>
 
           <FilterBar
-            searchQuery={searchQuery}
-            onSearch={(val) => {
-              setSearchQuery(val);
-              setCurrentPage(1);
-            }}
-            topics={topics}
-            selectedTopicId={selectedTopicId}
-            onTopicChange={(val) => {
-              setSelectedTopicId(val);
-              setCurrentPage(1);
-            }}
             companies={allCompanies}
             selectedCompany={selectedCompany}
             onCompanyChange={(val) => {
@@ -223,6 +205,7 @@ export const QnASection = ({ productId }: QnASectionProps) => {
             bookmarkedIds={bookmarkedIds}
             toggleExpand={toggleExpand}
             toggleBookmark={toggleBookmark}
+            isLoading={loadingTopicId !== ''}
           />
 
         {totalPages > 1 && (
