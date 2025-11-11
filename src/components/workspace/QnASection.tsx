@@ -1,7 +1,10 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Star, ChevronDown, ChevronUp, Building2, TrendingUp, BookOpen, Rows, Columns } from 'lucide-react';
+import { Star, ChevronDown, ChevronUp, Rows, Columns } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic } from '../../types/api';
+import { TopicSidebar } from './TopicSidebar';
+import { FilterBar } from './FilterBar';
+import { QnACardVertical } from './QnACardVertical';
 
 interface QnASectionProps {
   productId: string;
@@ -225,26 +228,14 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   return (
     <div className="p-8">
       <div className="flex gap-8">
-        {/* Topic sidebar */}
-        <aside className="hidden md:block w-60 shrink-0">
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-            {topics.map((topic) => {
-              const isActive = topic.id === selectedTopicId;
-              return (
-                <button
-                  key={topic.id}
-                  onClick={() => {
-                    setSelectedTopicId(topic.id);
-                    setCurrentPage(1);
-                  }}
-                  className={`w-full text-left px-4 py-3 text-sm transition border-b border-gray-200 last:border-b-0 ${isActive ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:bg-gray-50 text-gray-700'}`}
-                >
-                  {topic.name}
-                </button>
-              );
-            })}
-          </div>
-        </aside>
+        <TopicSidebar
+          topics={topics}
+          selectedTopicId={selectedTopicId}
+          onSelect={(id) => {
+            setSelectedTopicId(id);
+            setCurrentPage(1);
+          }}
+        />
         <main className="flex-1 max-w-5xl">
           <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
@@ -287,8 +278,34 @@ export const QnASection = ({ productId }: QnASectionProps) => {
             </div>
           </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
+        <FilterBar
+          searchQuery={searchQuery}
+          onSearch={(val) => {
+            setSearchQuery(val);
+            setCurrentPage(1);
+          }}
+          topics={topics}
+          selectedTopicId={selectedTopicId}
+          onTopicChange={(val) => {
+            setSelectedTopicId(val);
+            setCurrentPage(1);
+          }}
+          companies={allCompanies}
+          selectedCompany={selectedCompany}
+          onCompanyChange={(val) => {
+            setSelectedCompany(val);
+            setCurrentPage(1);
+          }}
+          selectedDifficulty={selectedDifficulty}
+          onDifficultyChange={(val) => {
+            setSelectedDifficulty(val);
+            setCurrentPage(1);
+          }}
+        />
+        <div className="text-sm text-gray-600 mb-6">
+          Showing {filteredQnA.length} question{filteredQnA.length !== 1 ? 's' : ''}
+        </div>
+          {/* Duplicate filter bar removed */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input

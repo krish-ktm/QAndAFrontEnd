@@ -1,0 +1,20 @@
+# Exclude heavy dependencies
+node_modules/**
+
+# Exclude pages and components not related to the Q&A workspace section
+src/components/auth/**
+src/components/dashboard/**
+src/components/layout/**
+src/components/ui/**
+
+# Exclude the PDF and Quiz sub-sections of the workspace
+src/components/workspace/PDFSection.tsx
+src/components/workspace/QuizGroupSelector.tsx
+src/components/workspace/QuizGroupView.tsx
+src/components/workspace/QuizSection.tsx
+src/components/workspace/QuizSelectionView.tsx
+
+# Exclude development & mock data helpers
+
+# Exclude global context not required for Q&A focus
+src/context/**
