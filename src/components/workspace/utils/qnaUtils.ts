@@ -6,13 +6,13 @@
 export const getDifficultyColor = (difficulty: string) => {
   switch (difficulty.toLowerCase()) {
     case 'beginner':
-      return 'bg-green-100 text-green-700';
+      return 'bg-green-50 text-green-700 border-green-200';
     case 'intermediate':
-      return 'bg-yellow-100 text-yellow-700';
+      return 'bg-yellow-50 text-yellow-700 border-yellow-200';
     case 'advanced':
-      return 'bg-red-100 text-red-700';
+      return 'bg-red-50 text-red-700 border-red-200';
     default:
-      return 'bg-gray-100 text-gray-700';
+      return 'bg-gray-50 text-gray-700 border-gray-200';
   }
 };
 
