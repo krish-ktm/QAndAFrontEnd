@@ -19,6 +19,7 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -74,15 +75,28 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <aside className="w-16 bg-white border-r border-gray-200 flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex relative">
+      <aside 
+        className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out relative z-20 ${
+          isSidebarHovered ? 'w-64' : 'w-16'
+        }`}
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
+      >
         <div className="p-3 border-b border-gray-200">
           <button
             onClick={onBack}
-            className="flex items-center justify-center w-10 h-10 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition"
+            className={`flex items-center gap-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition overflow-hidden ${
+              isSidebarHovered ? 'px-4 py-3 w-full' : 'justify-center w-10 h-10'
+            }`}
             title="Back to Dashboard"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 flex-shrink-0" />
+            <span className={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${
+              isSidebarHovered ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+            }`}>
+              Back to Dashboard
+            </span>
           </button>
         </div>
 
@@ -96,14 +110,19 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
                 <li key={section.id}>
                   <button
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center justify-center w-12 h-12 rounded-lg transition ${
+                    className={`w-full flex items-center gap-3 rounded-lg transition overflow-hidden ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-600 hover:bg-gray-50'
-                    }`}
+                        ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600'
+                        : 'text-gray-600 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
+                    } ${isSidebarHovered ? 'px-4 py-3' : 'justify-center w-12 h-12'}`}
                     title={section.label}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-600' : ''}`} />
+                    <span className={`text-sm font-medium whitespace-nowrap transition-opacity duration-300 ${
+                      isSidebarHovered ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+                    }`}>
+                      {section.label}
+                    </span>
                   </button>
                 </li>
               );
@@ -111,10 +130,20 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
           </ul>
         </nav>
 
-        <div className="p-2 border-t border-gray-200">
-          <div className="flex items-center justify-center w-12 h-12 bg-gray-50 rounded-lg">
+        <div className="p-3 border-t border-gray-200">
+          <div className={`flex items-center bg-gray-50 rounded-lg transition overflow-hidden ${
+            isSidebarHovered ? 'px-4 py-3 w-full' : 'justify-center w-12 h-12'
+          }`}>
             <div className="text-center">
               <div className="text-xs font-bold text-gray-900">50%</div>
+              <div className={`text-left ml-3 transition-opacity duration-300 ${
+                isSidebarHovered ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+              }`}>
+                <div className="text-xs font-medium text-gray-700 whitespace-nowrap">Overall Progress</div>
+                <div className="w-32 bg-gray-200 rounded-full h-1.5 mt-2">
+                  <div className="bg-blue-600 h-full rounded-full" style={{ width: '50%' }} />
+                </div>
+              </div>
             </div>
           </div>
         </div>
