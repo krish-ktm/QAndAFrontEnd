@@ -1,5 +1,5 @@
-import { Topic } from '../../types/api';
-import { Building2, TrendingUp, ChevronDown } from 'lucide-react';
+import { Building2, TrendingUp } from 'lucide-react';
+import { Dropdown } from '../ui/Dropdown';
 
 interface FilterBarProps {
   companies: string[];
@@ -23,38 +23,30 @@ export const FilterBar = ({
       <div className="flex gap-3 flex-1">
 
         {/* Company */}
-        <div className="relative group">
-          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-          <select
-            value={selectedCompany}
-            onChange={(e) => onCompanyChange(e.target.value)}
-            className="pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-sm hover:border-gray-400 transition-colors cursor-pointer"
-          >
-            <option value="all">All Companies</option>
-            {companies.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        </div>
+        <Dropdown
+          options={[
+            { value: 'all', label: 'All Companies' },
+            ...companies.map((c) => ({ value: c, label: c }))
+          ]}
+          value={selectedCompany}
+          onChange={onCompanyChange}
+          icon={<Building2 className="w-4 h-4" />}
+          placeholder="All Companies"
+        />
 
         {/* Difficulty */}
-        <div className="relative group">
-          <TrendingUp className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-          <select
-            value={selectedDifficulty}
-            onChange={(e) => onDifficultyChange(e.target.value)}
-            className="pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-sm hover:border-gray-400 transition-colors cursor-pointer"
-          >
-            <option value="all">All Levels</option>
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-        </div>
+        <Dropdown
+          options={[
+            { value: 'all', label: 'All Levels' },
+            { value: 'beginner', label: 'Beginner' },
+            { value: 'intermediate', label: 'Intermediate' },
+            { value: 'advanced', label: 'Advanced' }
+          ]}
+          value={selectedDifficulty}
+          onChange={onDifficultyChange}
+          icon={<TrendingUp className="w-4 h-4" />}
+          placeholder="All Levels"
+        />
       </div>
     </div>
   </div>
