@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter, ChevronDown, Play, Pause, X, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter, ChevronDown } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Flashcard, Topic } from '../../types/api';
 import { FlashcardCard } from './FlashcardCard';
@@ -18,7 +18,6 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [shuffleMode, setShuffleMode] = useState(false);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
 
   // Fetch topics for the product
   useEffect(() => {
@@ -87,31 +86,8 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
   useEffect(() => {
     setCurrentIndex(0);
     setIsFlipped(false);
-    setIsAutoPlaying(false);
   }, [selectedTopicId, shuffleMode]);
 
-  // Auto-play functionality
-  useEffect(() => {
-    if (isAutoPlaying && displayFlashcards.length > 0) {
-      const interval = setInterval(() => {
-        if (isFlipped) {
-          // Move to next card if currently showing answer
-          if (currentIndex < displayFlashcards.length - 1) {
-            setCurrentIndex(currentIndex + 1);
-            setIsFlipped(false);
-          } else {
-            // Stop at the end
-            setIsAutoPlaying(false);
-          }
-        } else {
-          // Flip to show answer
-          setIsFlipped(true);
-        }
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [isAutoPlaying, currentIndex, isFlipped, displayFlashcards.length]);
 
   const handleNext = () => {
     if (currentIndex < displayFlashcards.length - 1) {
@@ -131,20 +107,9 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
     setShuffleMode(!shuffleMode);
   };
 
-  const handleMarkMastered = (id: string, mastered: boolean) => {
-    setFlashcards(prev => 
-      prev.map(fc => 
-        fc.id === id ? { ...fc, mastered } : fc
-      )
-    );
-  };
-
   const progress = displayFlashcards.length > 0 
     ? ((currentIndex + 1) / displayFlashcards.length) * 100 
     : 0;
-
-  const masteredCount = displayFlashcards.filter(fc => fc.mastered).length;
-  const accuracy = displayFlashcards.length > 0 ? (masteredCount / displayFlashcards.length) * 100 : 0;
 
   if (loading) {
     return (
@@ -236,6 +201,7 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
               <div className="flex items-center gap-2">
                 <motion.button
                   onClick={handleShuffle}
+                  title="Randomize the order of flashcards for better learning"
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                     shuffleMode
                       ? 'bg-green-500 text-white'
@@ -248,26 +214,12 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
                   {shuffleMode ? 'Shuffled' : 'Shuffle'}
                 </motion.button>
 
-                <motion.button
-                  onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    isAutoPlaying
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {isAutoPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                  {isAutoPlaying ? 'Pause' : 'Auto Play'}
-                </motion.button>
               </div>
 
               {/* Progress */}
               <div className="flex items-center gap-4 text-sm">
                 <span className="text-gray-600">{currentIndex + 1}/{displayFlashcards.length}</span>
-                <span className="text-green-600 font-medium">{masteredCount} mastered</span>
-                <span className="text-blue-600 font-medium">{accuracy.toFixed(1)}%</span>
+                <span className="text-blue-600 font-medium">{progress.toFixed(0)}%</span>
               </div>
             </div>
           </motion.div>
@@ -313,7 +265,6 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
                   flashcard={currentFlashcard}
                   isFlipped={isFlipped}
                   onFlip={() => setIsFlipped(!isFlipped)}
-                  onMarkMastered={handleMarkMastered}
                 />
               </motion.div>
             </AnimatePresence>
@@ -358,22 +309,6 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
               <ChevronRight className="w-4 h-4" />
             </motion.button>
 
-            {/* Quick Master/Unmaster */}
-            <motion.button
-              onClick={() => {
-                handleMarkMastered(currentFlashcard.id, !currentFlashcard.mastered);
-              }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                currentFlashcard.mastered
-                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {currentFlashcard.mastered ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
-              {currentFlashcard.mastered ? 'Unmark' : 'Master'}
-            </motion.button>
           </motion.div>
         </div>
       </div>

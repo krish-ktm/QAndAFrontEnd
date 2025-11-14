@@ -1,12 +1,11 @@
 import { motion } from 'framer-motion';
 import { Flashcard } from '../../types/api';
-import { RotateCw, Check, X, Clock, Eye } from 'lucide-react';
+import { RotateCw, Clock, Eye } from 'lucide-react';
 
 interface FlashcardCardProps {
   flashcard: Flashcard;
   isFlipped: boolean;
   onFlip: () => void;
-  onMarkMastered: (id: string, mastered: boolean) => void;
 }
 
 const cardVariants = {
@@ -26,7 +25,7 @@ const cardTransition = {
   damping: 30,
 };
 
-export const FlashcardCard = ({ flashcard, isFlipped, onFlip, onMarkMastered }: FlashcardCardProps) => {
+export const FlashcardCard = ({ flashcard, isFlipped, onFlip }: FlashcardCardProps) => {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'beginner':
@@ -95,7 +94,7 @@ export const FlashcardCard = ({ flashcard, isFlipped, onFlip, onMarkMastered }: 
 
         {/* Back of card */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-200 p-4 sm:p-6 flex flex-col"
+          className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-xl shadow-lg border border-teal-200 p-4 sm:p-6 flex flex-col"
           style={{ 
             backfaceVisibility: 'hidden',
             transform: 'rotateY(180deg)'
@@ -110,7 +109,7 @@ export const FlashcardCard = ({ flashcard, isFlipped, onFlip, onMarkMastered }: 
                 e.stopPropagation();
                 onFlip();
               }}
-              className="p-1.5 sm:p-2 text-blue-400 hover:text-blue-600 hover:bg-white/50 rounded-lg transition-all duration-200"
+              className="p-1.5 sm:p-2 text-teal-400 hover:text-teal-600 hover:bg-white/50 rounded-lg transition-all duration-200"
               title="Flip card"
             >
               <RotateCw className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -120,8 +119,8 @@ export const FlashcardCard = ({ flashcard, isFlipped, onFlip, onMarkMastered }: 
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="flex items-center justify-center gap-1.5 mb-2 sm:mb-3">
-                <Eye className="w-3 h-3 text-blue-600" />
-                <div className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Answer</div>
+                <Eye className="w-3 h-3 text-teal-600" />
+                <div className="text-xs text-teal-600 font-semibold uppercase tracking-wide">Answer</div>
               </div>
               <p className="text-base sm:text-lg font-medium text-gray-900 leading-relaxed">
                 {flashcard.back}
@@ -129,37 +128,12 @@ export const FlashcardCard = ({ flashcard, isFlipped, onFlip, onMarkMastered }: 
             </div>
           </div>
           
-          <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-blue-100">
-            <span className="text-xs text-blue-700 font-semibold">{flashcard.category}</span>
-            <div className="flex gap-1.5">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMarkMastered(flashcard.id, false);
-                }}
-                className={`p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
-                  !flashcard.mastered 
-                    ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-                    : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                }`}
-                title="Mark as not mastered"
-              >
-                <X className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMarkMastered(flashcard.id, true);
-                }}
-                className={`p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
-                  flashcard.mastered 
-                    ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                    : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                }`}
-                title="Mark as mastered"
-              >
-                <Check className="w-3 h-3 sm:w-4 sm:h-4" />
-              </button>
+          <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-teal-100">
+            <span className="text-xs text-teal-700 font-semibold">{flashcard.category}</span>
+            <div className="flex items-center gap-1.5 text-xs text-teal-600">
+              <Clock className="w-3 h-3" />
+              <span className="hidden sm:inline">Click to flip back</span>
+              <span className="sm:hidden">Tap</span>
             </div>
           </div>
         </motion.div>
