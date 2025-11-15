@@ -137,6 +137,8 @@ export interface QuizGroup {
   description: string;
   order: number;
   isActive: boolean;
+  level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  estimatedDuration?: number; // in minutes
   createdAt: string;
   updatedAt: string;
 }
@@ -149,6 +151,7 @@ export interface Quiz {
   correctAnswer: string;
   explanation: string;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+   estimatedTime?: number; // in minutes
   companyTags: string[];
   createdAt: string;
   updatedAt: string;

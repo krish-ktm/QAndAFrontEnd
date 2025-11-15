@@ -257,7 +257,7 @@ export const QuizSelectionView = ({ productId, quizGroup, onSelectQuiz, onBackTo
                           
                           <span className="inline-flex items-center gap-1">
                             <Clock className="w-4 h-4" />
-                            ~2 min
+                            {quiz.estimatedTime ? `~${quiz.estimatedTime} min` : '—'}
                           </span>
                         </div>
                       </div>

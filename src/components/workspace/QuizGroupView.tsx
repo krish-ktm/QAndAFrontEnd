@@ -120,12 +120,14 @@ export const QuizGroupView = ({ productId, onSelectQuizGroup }: QuizGroupViewPro
                       
                       <span className="inline-flex items-center gap-1">
                         <BarChart2 className="w-4 h-4" />
-                        Mixed Difficulty
+                        {quizGroup.level
+                          ? `${quizGroup.level.charAt(0)}${quizGroup.level.slice(1).toLowerCase()} Level`
+                          : 'Mixed Difficulty'}
                       </span>
                       
                       <span className="inline-flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        ~15 min
+                        {quizGroup.estimatedDuration ? `~${quizGroup.estimatedDuration} min` : '—'}
                       </span>
                     </div>
                   </div>

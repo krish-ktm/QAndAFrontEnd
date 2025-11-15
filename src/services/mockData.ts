@@ -205,6 +205,8 @@ export const mockQuizGroups: QuizGroup[] = [
     description: 'Test your knowledge of algorithm time and space complexity',
     order: 1,
     isActive: true,
+    level: 'INTERMEDIATE',
+    estimatedDuration: 15,
     createdAt: '2023-01-17T10:00:00.000Z',
     updatedAt: '2023-01-17T10:00:00.000Z'
   },
@@ -215,6 +217,8 @@ export const mockQuizGroups: QuizGroup[] = [
     description: 'Questions about common data structures and their implementations',
     order: 2,
     isActive: true,
+    level: 'INTERMEDIATE',
+    estimatedDuration: 20,
     createdAt: '2023-01-17T10:15:00.000Z',
     updatedAt: '2023-01-17T10:15:00.000Z'
   },
@@ -225,6 +229,8 @@ export const mockQuizGroups: QuizGroup[] = [
     description: 'Common design patterns used in system architecture',
     order: 1,
     isActive: true,
+    level: 'BEGINNER',
+    estimatedDuration: 25,
     createdAt: '2023-02-22T12:00:00.000Z',
     updatedAt: '2023-02-22T12:00:00.000Z'
   },
@@ -240,6 +246,7 @@ export const mockQuizzes: Quiz[] = [
     correctAnswer: 'B',
     explanation: 'Binary search divides the search space in half with each comparison, resulting in O(log n) time complexity.',
     level: 'BEGINNER',
+    estimatedTime: 2,
     companyTags: ['Google', 'Microsoft'],
     createdAt: '2023-01-17T11:00:00.000Z',
     updatedAt: '2023-01-17T11:00:00.000Z'
@@ -252,6 +259,7 @@ export const mockQuizzes: Quiz[] = [
     correctAnswer: 'B',
     explanation: 'A combination of Hash Map (for O(1) lookups) and Doubly Linked List (for O(1) removals and insertions) provides optimal LRU cache implementation.',
     level: 'INTERMEDIATE',
+    estimatedTime: 3,
     companyTags: ['Amazon', 'Meta'],
     createdAt: '2023-01-17T11:15:00.000Z',
     updatedAt: '2023-01-17T11:15:00.000Z'
@@ -264,6 +272,7 @@ export const mockQuizzes: Quiz[] = [
     correctAnswer: 'C',
     explanation: 'QuickSort has O(n²) worst-case complexity when the pivot is always the smallest or largest element, though average case is O(n log n).',
     level: 'INTERMEDIATE',
+    estimatedTime: 3,
     companyTags: ['Google', 'Microsoft', 'Amazon'],
     createdAt: '2023-01-17T11:30:00.000Z',
     updatedAt: '2023-01-17T11:30:00.000Z'
@@ -276,6 +285,7 @@ export const mockQuizzes: Quiz[] = [
     correctAnswer: 'C',
     explanation: 'Singleton pattern ensures a class has only one instance and provides a global point of access to it.',
     level: 'BEGINNER',
+    estimatedTime: 2,
     companyTags: ['Amazon', 'Microsoft'],
     createdAt: '2023-02-22T13:00:00.000Z',
     updatedAt: '2023-02-22T13:00:00.000Z'
@@ -288,6 +298,7 @@ export const mockQuizzes: Quiz[] = [
     correctAnswer: 'B',
     explanation: 'Load balancers distribute incoming network traffic across multiple servers to ensure no single server is overwhelmed.',
     level: 'BEGINNER',
+    estimatedTime: 2,
     companyTags: ['Amazon', 'Google', 'Netflix'],
     createdAt: '2023-02-22T13:15:00.000Z',
     updatedAt: '2023-02-22T13:15:00.000Z'

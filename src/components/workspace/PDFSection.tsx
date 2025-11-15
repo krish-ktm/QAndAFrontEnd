@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Star, ExternalLink, Download } from 'lucide-react';
 import { apiService } from '../../services/apiService';
-import { PDF } from '../../types/api';
+import { PDF, Bookmark } from '../../types/api';
 
 interface PDFSectionProps {
   productId: string;
@@ -16,21 +16,27 @@ export const PDFSection = ({ productId }: PDFSectionProps) => {
   useEffect(() => {
     const fetchPDFs = async () => {
       try {
-        const response = await apiService.getPDFs(productId);
-        if (response.success) {
-          setPdfs(response.data);
-          
-          // In a real app, we would fetch bookmarks from the API
-          // For now, we'll just set random PDFs as bookmarked
-          const randomBookmarks = new Set<string>();
-          response.data.forEach(pdf => {
-            if (Math.random() > 0.7) {
-              randomBookmarks.add(pdf.id);
-            }
-          });
-          setBookmarkedIds(randomBookmarks);
+        const [pdfRes, bookmarksRes] = await Promise.all([
+          apiService.getPDFs(productId),
+          apiService.getBookmarks(),
+        ]);
+
+        if (pdfRes.success) {
+          setPdfs(pdfRes.data);
+
+          if (bookmarksRes.success) {
+            const bookmarkIds = new Set<string>();
+            (bookmarksRes.data as Bookmark[]).forEach((bm) => {
+              if (bm.pdfId) {
+                bookmarkIds.add(bm.pdfId);
+              }
+            });
+            setBookmarkedIds(bookmarkIds);
+          } else {
+            setBookmarkedIds(new Set());
+          }
         } else {
-          setError(response.message || 'Failed to load PDFs');
+          setError(pdfRes.message || 'Failed to load PDFs');
         }
       } catch (err) {
         console.error('Error fetching PDFs:', err);

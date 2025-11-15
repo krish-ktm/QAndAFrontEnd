@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, MessageSquare, Brain, FileText, Layers } from 'lucide-react';
 import { apiService } from '../../services/apiService';
-import { Product } from '../../types/api';
+import { Product, Progress, Topic } from '../../types/api';
 import { QnASection } from './QnASection';
 import { QuizSection } from './QuizSection';
 import { PDFSection } from './PDFSection';
@@ -20,15 +20,39 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const [overallProgress, setOverallProgress] = useState<number>(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await apiService.getProductDetail(productId);
-        if (response.success) {
-          setProduct(response.data);
+        const [productRes, topicsRes, progressRes] = await Promise.all([
+          apiService.getProductDetail(productId),
+          apiService.getTopics(productId),
+          apiService.getProgress(),
+        ]);
+
+        if (productRes.success) {
+          setProduct(productRes.data);
         } else {
-          setError(response.message || 'Failed to load product');
+          setError(productRes.message || 'Failed to load product');
+        }
+
+        if (topicsRes.success && progressRes.success) {
+          const topicIds = topicsRes.data.map((t: Topic) => t.id);
+          const progressForProduct = (progressRes.data as Progress[]).filter((p) =>
+            topicIds.includes(p.topicId)
+          );
+
+          if (progressForProduct.length > 0) {
+            const avg =
+              progressForProduct.reduce((sum, p) => sum + p.completionPercent, 0) /
+              progressForProduct.length;
+            setOverallProgress(Math.round(avg));
+          } else {
+            setOverallProgress(0);
+          }
+        } else {
+          setOverallProgress(0);
         }
       } catch (err) {
         console.error('Error fetching product:', err);
@@ -135,13 +159,13 @@ export const Workspace = ({ productId, onBack }: WorkspaceProps) => {
             isSidebarHovered ? 'px-4 py-3 w-full' : 'justify-center w-12 h-12'
           }`}>
             <div className="text-center">
-              <div className="text-xs font-bold text-gray-900">50%</div>
+              <div className="text-xs font-bold text-gray-900">{overallProgress}%</div>
               <div className={`text-left ml-3 transition-opacity duration-300 ${
                 isSidebarHovered ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
               }`}>
                 <div className="text-xs font-medium text-gray-700 whitespace-nowrap">Overall Progress</div>
                 <div className="w-32 bg-gray-200 rounded-full h-1.5 mt-2">
-                  <div className="bg-blue-600 h-full rounded-full" style={{ width: '50%' }} />
+                  <div className="bg-blue-600 h-full rounded-full" style={{ width: `${overallProgress}%` }} />
                 </div>
               </div>
             </div>

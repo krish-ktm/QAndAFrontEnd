@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { apiService } from '../../services/apiService';
-import { QnA, Topic } from '../../types/api';
+import { QnA, Topic, Bookmark } from '../../types/api';
 import { TopicSidebar } from './TopicSidebar';
 import { FilterBar } from './FilterBar';
 import { LoadingState } from './LoadingState';
@@ -52,28 +52,34 @@ export const QnASection = ({ productId }: QnASectionProps) => {
   const [selectedTopicId, setSelectedTopicId] = useState<string>('');
   const [loadingTopicId, setLoadingTopicId] = useState<string>('');
   
-  // Fetch QnAs for the selected topic
+  // Fetch QnAs for the selected topic and apply bookmarks from mock data
   useEffect(() => {
     if (!selectedTopicId) return;
     
     const fetchQnAs = async () => {
       setLoadingTopicId(selectedTopicId);
       try {
-        const response = await apiService.getQnA(productId, { topicId: selectedTopicId });
-        if (response.success) {
-          setQnas(response.data.items);
-          
-          // In a real app, we would fetch bookmarks from the API
-          // For now, we'll just set random QnAs as bookmarked
-          const randomBookmarks = new Set<string>();
-          response.data.items.forEach(qna => {
-            if (Math.random() > 0.7) {
-              randomBookmarks.add(qna.id);
-            }
-          });
-          setBookmarkedIds(randomBookmarks);
+        const [qnaRes, bookmarksRes] = await Promise.all([
+          apiService.getQnA(productId, { topicId: selectedTopicId }),
+          apiService.getBookmarks(),
+        ]);
+
+        if (qnaRes.success) {
+          setQnas(qnaRes.data.items);
+
+          if (bookmarksRes.success) {
+            const bookmarkIds = new Set<string>();
+            (bookmarksRes.data as Bookmark[]).forEach((bm) => {
+              if (bm.qnaId) {
+                bookmarkIds.add(bm.qnaId);
+              }
+            });
+            setBookmarkedIds(bookmarkIds);
+          } else {
+            setBookmarkedIds(new Set());
+          }
         } else {
-          setError(response.message || 'Failed to load Q&As');
+          setError(qnaRes.message || 'Failed to load Q&As');
         }
       } catch (err) {
         console.error('Error fetching Q&As:', err);

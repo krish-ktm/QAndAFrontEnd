@@ -1,6 +1,7 @@
 import { ArrowRight, Tag } from 'lucide-react';
-import { Product as ApiProduct } from '../../types/api';
+import { Product as ApiProduct, Progress, Topic } from '../../types/api';
 import { useState, useEffect } from 'react';
+import { apiService } from '../../services/apiService';
 
 interface ProductCardProps {
   product: ApiProduct;
@@ -12,10 +13,37 @@ export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
   const [tags, setTags] = useState<string[]>([]);
   
   useEffect(() => {
-    // In a real implementation, we would fetch progress from the API
-    // For now, we'll use a random progress value
-    setProgress(Math.floor(Math.random() * 100));
-    
+    const loadProgress = async () => {
+      try {
+        const [progressRes, topicsRes] = await Promise.all([
+          apiService.getProgress(),
+          apiService.getTopics(product.id),
+        ]);
+
+        if (progressRes.success && topicsRes.success) {
+          const topicsForProduct = topicsRes.data.map((t: Topic) => t.id);
+          const progressForProduct = (progressRes.data as Progress[]).filter((p) =>
+            topicsForProduct.includes(p.topicId)
+          );
+
+          if (progressForProduct.length > 0) {
+            const avg =
+              progressForProduct.reduce((sum, p) => sum + p.completionPercent, 0) /
+              progressForProduct.length;
+            setProgress(Math.round(avg));
+          } else {
+            setProgress(0);
+          }
+        } else {
+          setProgress(0);
+        }
+      } catch {
+        setProgress(0);
+      }
+    };
+
+    loadProgress();
+
     // Generate tags from product name and description
     const generatedTags = [];
     if (product.name.includes('Data')) generatedTags.push('Data');

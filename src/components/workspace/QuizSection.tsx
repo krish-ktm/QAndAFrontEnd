@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, XCircle, RotateCcw, Trophy, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, RotateCcw, Trophy, ArrowLeft, BarChart2, Clock } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Quiz, QuizGroup } from '../../types/api';
 import { QuizGroupView } from './QuizGroupView';
@@ -102,84 +102,35 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
   
   const handleSubmit = async () => {
     if (selectedAnswer === null || !currentQuiz) return;
-    
-    try {
-      // Calculate time taken in seconds
-      const timeTaken = startTime ? Math.round((Date.now() - startTime) / 1000) : 30;
-      
-      // Submit the answer to the API
-      const response = await apiService.submitQuizAnswer(productId, currentQuiz.id, {
-        selectedAnswer,
-        timeTaken
-      });
-      
-      if (response.success) {
-        // Create a new attempt based on API response
-        const newAttempt: LocalQuizAttempt = {
-          quizId: currentQuiz.id,
-          selectedAnswer,
-          isCorrect: response.data.isCorrect,
-        };
-        
-        setAttempts([...attempts, newAttempt]);
-        
-        // Move to next question or show completion
-        if (isLastQuiz) {
-          // Quiz completed - will show completion page
-          setCurrentQuizIndex(currentQuizIndex + 1);
-        } else {
-          // Move to next question
-          setCurrentQuizIndex(currentQuizIndex + 1);
-          setSelectedAnswer(null);
-        }
-      } else {
-        // Fallback to local checking if API fails
-        const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
-        
-        const newAttempt: LocalQuizAttempt = {
-          quizId: currentQuiz.id,
-          selectedAnswer,
-          isCorrect,
-        };
-        
-        setAttempts([...attempts, newAttempt]);
-        
-        // Move to next question or show completion
-        if (isLastQuiz) {
-          // Quiz completed - will show completion page
-          setCurrentQuizIndex(currentQuizIndex + 1);
-        } else {
-          // Move to next question
-          setCurrentQuizIndex(currentQuizIndex + 1);
-          setSelectedAnswer(null);
-        }
-        
-        console.error('API Error:', response.message);
-      }
-    } catch (err) {
-      // Fallback to local checking if API call fails
-      const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
-      
-      const newAttempt: LocalQuizAttempt = {
-        quizId: currentQuiz.id,
-        selectedAnswer,
-        isCorrect,
-      };
-      
-      setAttempts([...attempts, newAttempt]);
-      
-      // Move to next question or show completion
-      if (isLastQuiz) {
-        // Quiz completed - will show completion page
-        setCurrentQuizIndex(currentQuizIndex + 1);
-      } else {
-        // Move to next question
-        setCurrentQuizIndex(currentQuizIndex + 1);
-        setSelectedAnswer(null);
-      }
-      
-      console.error('Error submitting answer:', err);
+
+    // Advance UI immediately for smooth transition
+    const isCorrect = selectedAnswer === currentQuiz.correctAnswer;
+    const newAttempt: LocalQuizAttempt = {
+      quizId: currentQuiz.id,
+      selectedAnswer,
+      isCorrect,
+    };
+    setAttempts([...attempts, newAttempt]);
+
+    if (isLastQuiz) {
+      setCurrentQuizIndex(currentQuizIndex + 1);
+    } else {
+      setCurrentQuizIndex(currentQuizIndex + 1);
+      setSelectedAnswer(null);
     }
+
+    // Submit in background (no await) to avoid blocking UI
+    (async () => {
+      try {
+        const timeTaken = startTime ? Math.round((Date.now() - startTime) / 1000) : 30;
+        await apiService.submitQuizAnswer(productId, currentQuiz.id, {
+          selectedAnswer,
+          timeTaken,
+        });
+      } catch (err) {
+        console.error('Error submitting answer:', err);
+      }
+    })();
   };
 
   const handleRestart = () => {
@@ -428,11 +379,38 @@ export const QuizSection = ({ productId }: QuizSectionProps) => {
           </button>
           
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
               <h1 className="text-3xl font-bold text-gray-900">Quiz Challenge</h1>
               <span className="text-sm font-medium text-gray-600">
                 Question {currentQuizIndex + 1} of {totalQuizzes}
               </span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 text-sm text-gray-600">
+              {selectedQuizGroup && (
+                <div className="flex items-center gap-4">
+                  <span className="inline-flex items-center gap-1">
+                    <BarChart2 className="w-4 h-4" />
+                    {selectedQuizGroup.level
+                      ? `${selectedQuizGroup.level.charAt(0)}${selectedQuizGroup.level.slice(1).toLowerCase()} Level`
+                      : 'Mixed Difficulty'}
+                  </span>
+
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {selectedQuizGroup.estimatedDuration
+                      ? `~${selectedQuizGroup.estimatedDuration} min total`
+                      : 'Duration: —'}
+                  </span>
+                </div>
+              )}
+
+              {currentQuiz.estimatedTime && (
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {`~${currentQuiz.estimatedTime} min per question`}
+                </span>
+              )}
             </div>
 
             <div className="w-full bg-gray-200 rounded-full h-2">
