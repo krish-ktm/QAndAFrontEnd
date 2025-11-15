@@ -79,7 +79,7 @@ export const Dropdown = ({
           {displayValue}
         </span>
         
-        <span className={`flex-shrink-0 text-gray-400 ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+        <span className={`flex-shrink-0 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
           <ChevronDown className="w-4 h-4" />
         </span>
       </button>

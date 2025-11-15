@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter, TrendingUp } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Flashcard, Topic } from '../../types/api';
 import { FlashcardCard } from './FlashcardCard';
+import { Dropdown } from '../ui/Dropdown';
 
 interface FlashcardSectionProps {
   productId: string;
@@ -13,6 +14,7 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedTopicId, setSelectedTopicId] = useState<string>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -60,13 +62,22 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
     fetchFlashcards();
   }, [productId]);
 
-  // Filter flashcards by topic
+  // Filter flashcards by topic and difficulty
   const filteredFlashcards = useMemo(() => {
-    if (selectedTopicId === 'all') {
-      return flashcards;
+    let filtered = flashcards;
+    
+    // Filter by topic
+    if (selectedTopicId !== 'all') {
+      filtered = filtered.filter(fc => fc.topicId === selectedTopicId);
     }
-    return flashcards.filter(fc => fc.topicId === selectedTopicId);
-  }, [flashcards, selectedTopicId]);
+    
+    // Filter by difficulty
+    if (selectedDifficulty !== 'all') {
+      filtered = filtered.filter(fc => fc.difficulty.toLowerCase() === selectedDifficulty);
+    }
+    
+    return filtered;
+  }, [flashcards, selectedTopicId, selectedDifficulty]);
 
   // Apply shuffle if enabled
   const displayFlashcards = useMemo(() => {
@@ -86,7 +97,38 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
   useEffect(() => {
     setCurrentIndex(0);
     setIsFlipped(false);
-  }, [selectedTopicId, shuffleMode]);
+  }, [selectedTopicId, selectedDifficulty, shuffleMode]);
+
+  // Create dropdown options for topics
+  const topicOptions = useMemo(() => {
+    const options = [
+      { value: 'all', label: `All Topics (${flashcards.length})` }
+    ];
+    
+    topics.forEach((topic) => {
+      const count = flashcards.filter(fc => fc.topicId === topic.id).length;
+      if (count > 0) {
+        options.push({
+          value: topic.id,
+          label: `${topic.name} (${count})`
+        });
+      }
+    });
+    
+    return options;
+  }, [topics, flashcards]);
+
+  // Create dropdown options for difficulty
+  const difficultyOptions = useMemo(() => {
+    const options = [
+      { value: 'all', label: 'All Levels' },
+      { value: 'beginner', label: 'Beginner' },
+      { value: 'intermediate', label: 'Intermediate' },
+      { value: 'advanced', label: 'Advanced' }
+    ];
+    
+    return options;
+  }, []);
 
 
   const handleNext = () => {
@@ -175,26 +217,31 @@ export const FlashcardSection = ({ productId }: FlashcardSectionProps) => {
             className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6"
           >
             <div className="flex flex-wrap items-center justify-between gap-4">
-              {/* Topic Filter */}
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                <select
-                  value={selectedTopicId}
-                  onChange={(e) => setSelectedTopicId(e.target.value)}
-                  className="pl-10 pr-8 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white text-sm"
-                >
-                  <option value="all">All Topics ({flashcards.length})</option>
-                  {topics.map((topic) => {
-                    const count = flashcards.filter(fc => fc.topicId === topic.id).length;
-                    if (count === 0) return null;
-                    return (
-                      <option key={topic.id} value={topic.id}>
-                        {topic.name} ({count})
-                      </option>
-                    );
-                  })}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+              {/* Filters */}
+              <div className="flex gap-3 flex-1">
+                {/* Topic Filter */}
+                <div className="min-w-64">
+                  <Dropdown
+                    options={topicOptions}
+                    value={selectedTopicId}
+                    onChange={setSelectedTopicId}
+                    placeholder="Select a topic"
+                    icon={<Filter className="w-4 h-4" />}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Difficulty Filter */}
+                <div className="min-w-48">
+                  <Dropdown
+                    options={difficultyOptions}
+                    value={selectedDifficulty}
+                    onChange={setSelectedDifficulty}
+                    placeholder="Select difficulty"
+                    icon={<TrendingUp className="w-4 h-4" />}
+                    className="w-full"
+                  />
+                </div>
               </div>
 
               {/* Study Options */}
