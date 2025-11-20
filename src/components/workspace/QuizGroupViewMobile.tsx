@@ -89,7 +89,7 @@ export const QuizGroupViewMobile = ({ productId, onSelectQuizGroup }: QuizGroupV
                         key={quizGroup.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
+                        transition={{ duration: 0.2 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleQuizGroupClick(quizGroup)}
                         className={`bg-white rounded-xl p-4 border shadow-sm relative overflow-hidden transition-all ${selectedGroupId === quizGroup.id
@@ -99,11 +99,8 @@ export const QuizGroupViewMobile = ({ productId, onSelectQuizGroup }: QuizGroupV
                     >
                         {/* Selection Indicator Background */}
                         {selectedGroupId === quizGroup.id && (
-                            <motion.div
-                                layoutId="selection"
-                                className="absolute inset-0 bg-blue-50 opacity-50"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 0.5 }}
+                            <div
+                                className="absolute inset-0 bg-blue-50 opacity-50 transition-opacity duration-200"
                             />
                         )}
 

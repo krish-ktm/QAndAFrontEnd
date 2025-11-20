@@ -213,32 +213,35 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
                         <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
-                            className="bg-white rounded-xl shadow-sm p-4 mb-4 space-y-3 overflow-hidden"
+                            exit={{ height: 0, opacity: 0 }}
+                            className="bg-white rounded-xl shadow-sm mb-4 overflow-hidden"
                         >
-                            <Dropdown
-                                options={topicOptions}
-                                value={selectedTopicId}
-                                onChange={setSelectedTopicId}
-                                placeholder="Select Topic"
-                                className="w-full"
-                            />
-                            <Dropdown
-                                options={difficultyOptions}
-                                value={selectedDifficulty}
-                                onChange={setSelectedDifficulty}
-                                placeholder="Select Difficulty"
-                                className="w-full"
-                            />
-                            <button
-                                onClick={handleShuffle}
-                                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
-                                    ? 'bg-green-500 text-white'
-                                    : 'bg-gray-100 text-gray-700'
-                                    }`}
-                            >
-                                <Shuffle className="w-4 h-4" />
-                                {shuffleMode ? 'Shuffle On' : 'Shuffle Off'}
-                            </button>
+                            <div className="p-4 space-y-3">
+                                <Dropdown
+                                    options={topicOptions}
+                                    value={selectedTopicId}
+                                    onChange={setSelectedTopicId}
+                                    placeholder="Select Topic"
+                                    className="w-full"
+                                />
+                                <Dropdown
+                                    options={difficultyOptions}
+                                    value={selectedDifficulty}
+                                    onChange={setSelectedDifficulty}
+                                    placeholder="Select Difficulty"
+                                    className="w-full"
+                                />
+                                <button
+                                    onClick={handleShuffle}
+                                    className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gray-100 text-gray-700'
+                                        }`}
+                                >
+                                    <Shuffle className="w-4 h-4" />
+                                    {shuffleMode ? 'Shuffle On' : 'Shuffle Off'}
+                                </button>
+                            </div>
                         </motion.div>
                     )}
 

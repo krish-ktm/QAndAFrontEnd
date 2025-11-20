@@ -24,7 +24,9 @@ const AppContent = () => {
     );
   }
 
-  const showHeader = !isMobile || !selectedProductId;
+  // Only show global header on desktop
+  // On mobile, Dashboard has its own header inside AnimatedPage, and Workspace has its own header
+  const showHeader = !isMobile;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -36,6 +38,7 @@ const AppContent = () => {
           </AnimatedPage>
         ) : (
           <AnimatedPage key="dashboard">
+            {isMobile && <Header />}
             <Dashboard onSelectProduct={setSelectedProductId} />
           </AnimatedPage>
         )}

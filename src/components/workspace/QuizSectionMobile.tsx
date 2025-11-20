@@ -363,7 +363,7 @@ export const QuizSectionMobile = ({ productId, view, onViewChange }: QuizSection
                             animate={{ x: 0, opacity: 1 }}
                             exit={{ x: -20, opacity: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4"
+                            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4 will-change-transform"
                         >
                             <h2 className="text-lg font-bold text-gray-900 leading-snug mb-4">{currentQuiz.question}</h2>
 
