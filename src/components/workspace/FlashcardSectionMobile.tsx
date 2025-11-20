@@ -201,8 +201,8 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
                         <button
                             onClick={() => setShowFilters(!showFilters)}
                             className={`p-2 rounded-lg transition-colors ${showFilters || selectedTopicId !== 'all' || selectedDifficulty !== 'all'
-                                    ? 'bg-blue-50 text-blue-600'
-                                    : 'bg-white shadow-sm text-gray-600'
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'bg-white shadow-sm text-gray-600'
                                 }`}
                         >
                             <Filter className="w-5 h-5" />
@@ -232,8 +232,8 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
                             <button
                                 onClick={handleShuffle}
                                 className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
-                                        ? 'bg-green-500 text-white'
-                                        : 'bg-gray-100 text-gray-700'
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-gray-100 text-gray-700'
                                     }`}
                             >
                                 <Shuffle className="w-4 h-4" />
