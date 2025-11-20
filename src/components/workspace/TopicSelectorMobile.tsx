@@ -55,6 +55,7 @@ export const TopicSelectorMobile = ({ topics, selectedTopicId, onSelectTopic }: 
                             exit={{ opacity: 0 }}
                             onClick={() => setIsOpen(false)}
                             className="fixed inset-0 bg-black/50 z-[60]"
+                            style={{ willChange: 'opacity' }}
                         />
 
                         {/* Sheet */}
@@ -64,6 +65,7 @@ export const TopicSelectorMobile = ({ topics, selectedTopicId, onSelectTopic }: 
                             exit={{ y: '100%' }}
                             transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
                             className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[70] max-h-[80vh] flex flex-col shadow-xl"
+                            style={{ willChange: 'transform' }}
                         >
                             {/* Sheet Header */}
                             <div className="p-4 border-b border-gray-100 flex items-center justify-between">

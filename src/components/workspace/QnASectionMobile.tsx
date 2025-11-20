@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Filter } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic, Bookmark } from '../../types/api';
 import { LoadingState } from './LoadingState';
@@ -20,7 +21,6 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
     const [showFilters, setShowFilters] = useState(false);
-    const [overflowVisible, setOverflowVisible] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -141,16 +141,6 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
         }
     }, [currentPage]);
 
-    // Handle overflow visibility for smooth animation
-    useEffect(() => {
-        if (showFilters) {
-            const timer = setTimeout(() => setOverflowVisible(true), 300);
-            return () => clearTimeout(timer);
-        } else {
-            setOverflowVisible(false);
-        }
-    }, [showFilters]);
-
     const toggleExpand = (id: string) => {
         setExpandedIds(prev => {
             const next = new Set(prev);
@@ -228,26 +218,35 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                     </div>
                 </div>
 
-                <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${showFilters ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                    <div className={`overflow-hidden ${overflowVisible ? 'overflow-visible' : ''}`}>
-                        <div className="bg-gray-50 p-2 rounded-lg mb-4 space-y-2">
-                            <Dropdown
-                                options={companyOptions}
-                                value={selectedCompany}
-                                onChange={setSelectedCompany}
-                                placeholder="Select Company"
-                                className="w-full"
-                            />
-                            <Dropdown
-                                options={difficultyOptions}
-                                value={selectedDifficulty}
-                                onChange={setSelectedDifficulty}
-                                placeholder="Select Difficulty"
-                                className="w-full"
-                            />
-                        </div>
-                    </div>
-                </div>
+                <AnimatePresence>
+                    {showFilters && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className="overflow-hidden"
+                            style={{ willChange: 'height, opacity' }}
+                        >
+                            <div className="bg-gray-50 p-2 rounded-lg mb-4 space-y-2">
+                                <Dropdown
+                                    options={companyOptions}
+                                    value={selectedCompany}
+                                    onChange={setSelectedCompany}
+                                    placeholder="Select Company"
+                                    className="w-full"
+                                />
+                                <Dropdown
+                                    options={difficultyOptions}
+                                    value={selectedDifficulty}
+                                    onChange={setSelectedDifficulty}
+                                    placeholder="Select Difficulty"
+                                    className="w-full"
+                                />
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 <CardView
                     qnas={paginatedQnA}

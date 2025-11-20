@@ -21,7 +21,6 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
     const [error, setError] = useState<string | null>(null);
     const [shuffleMode, setShuffleMode] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
-    const [overflowVisible, setOverflowVisible] = useState(false);
 
     // Fetch topics for the product
     useEffect(() => {
@@ -133,15 +132,7 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
     }, []);
 
 
-    // Handle overflow visibility for smooth animation
-    useEffect(() => {
-        if (showFilters) {
-            const timer = setTimeout(() => setOverflowVisible(true), 300);
-            return () => clearTimeout(timer);
-        } else {
-            setOverflowVisible(false);
-        }
-    }, [showFilters]);
+
 
 
     const handleNext = () => {
@@ -221,38 +212,47 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
                         </button>
                     </div>
 
-                    <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${showFilters ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                        <div className={`overflow-hidden ${overflowVisible ? 'overflow-visible' : ''}`}>
-                            <div className="bg-white rounded-xl shadow-sm mb-4">
-                                <div className="p-4 space-y-3">
-                                    <Dropdown
-                                        options={topicOptions}
-                                        value={selectedTopicId}
-                                        onChange={setSelectedTopicId}
-                                        placeholder="Select Topic"
-                                        className="w-full"
-                                    />
-                                    <Dropdown
-                                        options={difficultyOptions}
-                                        value={selectedDifficulty}
-                                        onChange={setSelectedDifficulty}
-                                        placeholder="Select Difficulty"
-                                        className="w-full"
-                                    />
-                                    <button
-                                        onClick={handleShuffle}
-                                        className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
-                                            ? 'bg-green-500 text-white'
-                                            : 'bg-gray-100 text-gray-700'
-                                            }`}
-                                    >
-                                        <Shuffle className="w-4 h-4" />
-                                        {shuffleMode ? 'Shuffle On' : 'Shuffle Off'}
-                                    </button>
+                    <AnimatePresence>
+                        {showFilters && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                className="overflow-hidden"
+                                style={{ willChange: 'height, opacity' }}
+                            >
+                                <div className="bg-white rounded-xl shadow-sm mb-4">
+                                    <div className="p-4 space-y-3">
+                                        <Dropdown
+                                            options={topicOptions}
+                                            value={selectedTopicId}
+                                            onChange={setSelectedTopicId}
+                                            placeholder="Select Topic"
+                                            className="w-full"
+                                        />
+                                        <Dropdown
+                                            options={difficultyOptions}
+                                            value={selectedDifficulty}
+                                            onChange={setSelectedDifficulty}
+                                            placeholder="Select Difficulty"
+                                            className="w-full"
+                                        />
+                                        <button
+                                            onClick={handleShuffle}
+                                            className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-gray-100 text-gray-700'
+                                                }`}
+                                        >
+                                            <Shuffle className="w-4 h-4" />
+                                            {shuffleMode ? 'Shuffle On' : 'Shuffle Off'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* Progress Bar */}
                     <div className="relative mb-2">
