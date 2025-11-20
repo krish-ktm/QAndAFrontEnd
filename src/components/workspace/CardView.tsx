@@ -11,11 +11,11 @@ interface CardViewProps {
   isLoading?: boolean;
 }
 
-export const CardView = ({ 
-  qnas, 
-  expandedIds, 
-  bookmarkedIds, 
-  toggleExpand, 
+export const CardView = ({
+  qnas,
+  expandedIds,
+  bookmarkedIds,
+  toggleExpand,
   toggleBookmark,
   isLoading = false
 }: CardViewProps) => {
@@ -37,13 +37,13 @@ export const CardView = ({
                   </div>
                   <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-1.5 mb-3">
                   <div className="h-5 w-14 bg-gray-200 rounded-full"></div>
                   <div className="h-5 w-16 bg-gray-200 rounded-full"></div>
                   <div className="h-5 w-16 bg-gray-200 rounded-full"></div>
                 </div>
-                
+
                 <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
                   <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 bg-gray-200 rounded"></div>
@@ -55,7 +55,7 @@ export const CardView = ({
             </div>
           </div>
         ))}
-        
+
         <div className="flex items-center justify-center py-6 sm:py-8">
           <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
           <span className="ml-2 text-sm text-gray-600 font-medium">Loading questions...</span>
@@ -63,7 +63,7 @@ export const CardView = ({
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-3 sm:space-y-4">
       {qnas.map((qna: QnA) => {
@@ -81,7 +81,6 @@ export const CardView = ({
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
                     <span className="text-xs font-medium text-gray-500 uppercase tracking-wide hidden sm:block">Question</span>
                   </div>
                   <h3 className="text-sm sm:text-base font-semibold text-gray-900 leading-snug group-hover:text-blue-900 transition-colors">

@@ -20,7 +20,6 @@ export const QnACard = ({ qna, isExpanded, isBookmarked, toggleExpand, toggleBoo
         {/* Status indicator */}
         <div className="absolute top-3 left-3">
           <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
             <span className="text-xs font-medium text-gray-500 uppercase tracking-wide hidden sm:block">Question</span>
           </div>
         </div>
@@ -67,22 +66,27 @@ export const QnACard = ({ qna, isExpanded, isBookmarked, toggleExpand, toggleBoo
           )}
         </div>
 
-        {isExpanded && (
-          <div className="mb-3 p-3 bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-lg border border-gray-100 space-y-3 animate-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center gap-1.5 mb-2">
-              <Eye className="w-3 h-3 text-blue-500" />
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Answer</span>
-            </div>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">{qna.answer}</p>
-            {qna.exampleCode && (
-              <div className="relative">
-                <pre className="bg-gray-900 text-gray-100 text-xs p-3 rounded-lg overflow-x-auto border border-gray-200 font-mono">
-                  {qna.exampleCode}
-                </pre>
+        <div
+          className={`grid transition-[grid-template-rows] duration-300 ease-out ${isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+            }`}
+        >
+          <div className="overflow-hidden">
+            <div className="mb-3 p-3 bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-lg border border-gray-100 space-y-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Eye className="w-3 h-3 text-blue-500" />
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Answer</span>
               </div>
-            )}
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line text-sm">{qna.answer}</p>
+              {qna.exampleCode && (
+                <div className="relative">
+                  <pre className="bg-gray-900 text-gray-100 text-xs p-3 rounded-lg overflow-x-auto border border-gray-200 font-mono">
+                    {qna.exampleCode}
+                  </pre>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
           <div className="flex items-center gap-1.5 text-xs text-gray-400">

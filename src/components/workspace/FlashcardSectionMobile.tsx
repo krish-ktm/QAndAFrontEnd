@@ -21,6 +21,7 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
     const [error, setError] = useState<string | null>(null);
     const [shuffleMode, setShuffleMode] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
+    const [overflowVisible, setOverflowVisible] = useState(false);
 
     // Fetch topics for the product
     useEffect(() => {
@@ -132,6 +133,17 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
     }, []);
 
 
+    // Handle overflow visibility for smooth animation
+    useEffect(() => {
+        if (showFilters) {
+            const timer = setTimeout(() => setOverflowVisible(true), 300);
+            return () => clearTimeout(timer);
+        } else {
+            setOverflowVisible(false);
+        }
+    }, [showFilters]);
+
+
     const handleNext = () => {
         if (currentIndex < displayFlashcards.length - 1) {
             setCurrentIndex(currentIndex + 1);
@@ -209,41 +221,38 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
                         </button>
                     </div>
 
-                    {showFilters && (
-                        <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="bg-white rounded-xl shadow-sm mb-4 overflow-hidden"
-                        >
-                            <div className="p-4 space-y-3">
-                                <Dropdown
-                                    options={topicOptions}
-                                    value={selectedTopicId}
-                                    onChange={setSelectedTopicId}
-                                    placeholder="Select Topic"
-                                    className="w-full"
-                                />
-                                <Dropdown
-                                    options={difficultyOptions}
-                                    value={selectedDifficulty}
-                                    onChange={setSelectedDifficulty}
-                                    placeholder="Select Difficulty"
-                                    className="w-full"
-                                />
-                                <button
-                                    onClick={handleShuffle}
-                                    className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
-                                        ? 'bg-green-500 text-white'
-                                        : 'bg-gray-100 text-gray-700'
-                                        }`}
-                                >
-                                    <Shuffle className="w-4 h-4" />
-                                    {shuffleMode ? 'Shuffle On' : 'Shuffle Off'}
-                                </button>
+                    <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${showFilters ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                        <div className={`overflow-hidden ${overflowVisible ? 'overflow-visible' : ''}`}>
+                            <div className="bg-white rounded-xl shadow-sm mb-4">
+                                <div className="p-4 space-y-3">
+                                    <Dropdown
+                                        options={topicOptions}
+                                        value={selectedTopicId}
+                                        onChange={setSelectedTopicId}
+                                        placeholder="Select Topic"
+                                        className="w-full"
+                                    />
+                                    <Dropdown
+                                        options={difficultyOptions}
+                                        value={selectedDifficulty}
+                                        onChange={setSelectedDifficulty}
+                                        placeholder="Select Difficulty"
+                                        className="w-full"
+                                    />
+                                    <button
+                                        onClick={handleShuffle}
+                                        className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${shuffleMode
+                                            ? 'bg-green-500 text-white'
+                                            : 'bg-gray-100 text-gray-700'
+                                            }`}
+                                    >
+                                        <Shuffle className="w-4 h-4" />
+                                        {shuffleMode ? 'Shuffle On' : 'Shuffle Off'}
+                                    </button>
+                                </div>
                             </div>
-                        </motion.div>
-                    )}
+                        </div>
+                    </div>
 
                     {/* Progress Bar */}
                     <div className="relative mb-2">
@@ -267,9 +276,9 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={`${selectedTopicId}-${currentIndex}-${shuffleMode}`}
-                            initial={{ opacity: 0, x: 50, scale: 0.95 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: -50, scale: 0.95 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.05 }}
                             transition={{ duration: 0.3 }}
                             className="w-full h-full max-h-[400px]"
                             onClick={() => setIsFlipped(!isFlipped)}
@@ -285,7 +294,7 @@ export const FlashcardSectionMobile = ({ productId }: FlashcardSectionMobileProp
             </div>
 
             {/* Fixed Bottom Controls */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-20 pb-safe flex gap-3">
+            <div className="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-gray-200 z-20 pb-safe flex gap-3">
                 <button
                     onClick={handlePrevious}
                     disabled={currentIndex === 0}

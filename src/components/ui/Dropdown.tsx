@@ -57,7 +57,7 @@ export const Dropdown = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
         className={`
-          w-full px-4 py-2.5 pr-10 bg-white border border-gray-300 rounded-lg
+          w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg
           flex items-center gap-3 text-sm font-medium text-left
           transition-all duration-200 cursor-pointer
           hover:border-gray-400 hover:shadow-sm
@@ -71,14 +71,14 @@ export const Dropdown = ({
             {icon}
           </span>
         )}
-        
+
         <span className={`
           flex-1 truncate
           ${value ? 'text-gray-900' : 'text-gray-500'}
         `}>
           {displayValue}
         </span>
-        
+
         <span className={`flex-shrink-0 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
           <ChevronDown className="w-4 h-4" />
         </span>
@@ -86,7 +86,7 @@ export const Dropdown = ({
 
       {isOpen && (
         <div className={`
-          absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl
+          absolute z-50 w-full bg-white border border-gray-200 rounded-xl
           shadow-lg overflow-hidden
           ${isOpen ? 'ring-1 ring-blue-500 ring-opacity-20' : ''}
         `}>
@@ -100,12 +100,12 @@ export const Dropdown = ({
                 className={`
                   w-full px-4 py-2.5 text-left text-sm flex items-center gap-3
                   transition-all duration-150 cursor-pointer
-                  ${option.disabled 
-                    ? 'opacity-50 cursor-not-allowed text-gray-400' 
+                  ${option.disabled
+                    ? 'opacity-50 cursor-not-allowed text-gray-400'
                     : 'hover:bg-blue-50 hover:text-blue-700'
                   }
-                  ${value === option.value 
-                    ? 'bg-blue-50 text-blue-700 font-medium' 
+                  ${value === option.value
+                    ? 'bg-blue-50 text-blue-700 font-medium'
                     : 'text-gray-700'
                   }
                 `}
@@ -113,7 +113,7 @@ export const Dropdown = ({
                 <span className="flex-1 truncate min-w-0">
                   {option.label}
                 </span>
-                
+
                 {value === option.value && (
                   <span className="flex-shrink-0">
                     <Check className="w-4 h-4 text-blue-600" />

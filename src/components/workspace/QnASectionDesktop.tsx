@@ -21,6 +21,11 @@ export const QnASectionDesktop = ({ productId }: QnASectionDesktopProps) => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
+    // Scroll to top on page change
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentPage]);
+
     // State for API data
     const [topics, setTopics] = useState<Topic[]>([]);
     const [qnas, setQnas] = useState<QnA[]>([]);

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Filter } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QnA, Topic, Bookmark } from '../../types/api';
@@ -20,8 +20,10 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
     const [showFilters, setShowFilters] = useState(false);
+    const [overflowVisible, setOverflowVisible] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // State for API data
     const [topics, setTopics] = useState<Topic[]>([]);
@@ -132,6 +134,23 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
         setCurrentPage(1);
     }, [selectedCompany, selectedDifficulty]);
 
+    // Scroll to top on page change
+    useEffect(() => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [currentPage]);
+
+    // Handle overflow visibility for smooth animation
+    useEffect(() => {
+        if (showFilters) {
+            const timer = setTimeout(() => setOverflowVisible(true), 300);
+            return () => clearTimeout(timer);
+        } else {
+            setOverflowVisible(false);
+        }
+    }, [showFilters]);
+
     const toggleExpand = (id: string) => {
         setExpandedIds(prev => {
             const next = new Set(prev);
@@ -190,7 +209,7 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                 onSelectTopic={setSelectedTopicId}
             />
 
-            <div className="p-4 flex-1 overflow-y-auto">
+            <div ref={scrollContainerRef} className="p-4 flex-1 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-gray-900">Questions</h2>
                     <div className="flex items-center gap-2">
@@ -199,7 +218,7 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                         </span>
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`p-2 rounded-lg transition-colors ${showFilters || selectedCompany !== 'all' || selectedDifficulty !== 'all'
+                            className={`p-2 rounded-lg transition-all duration-300 ease-out hover:-translate-y-0.5 active:scale-95 ${showFilters || selectedCompany !== 'all' || selectedDifficulty !== 'all'
                                 ? 'bg-blue-50 text-blue-600'
                                 : 'bg-gray-100 text-gray-600'
                                 }`}
@@ -209,24 +228,26 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                     </div>
                 </div>
 
-                {showFilters && (
-                    <div className="bg-gray-50 p-2 rounded-lg mb-4 space-y-2 animate-in fade-in slide-in-from-top-2">
-                        <Dropdown
-                            options={companyOptions}
-                            value={selectedCompany}
-                            onChange={setSelectedCompany}
-                            placeholder="Select Company"
-                            className="w-full"
-                        />
-                        <Dropdown
-                            options={difficultyOptions}
-                            value={selectedDifficulty}
-                            onChange={setSelectedDifficulty}
-                            placeholder="Select Difficulty"
-                            className="w-full"
-                        />
+                <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${showFilters ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                    <div className={`overflow-hidden ${overflowVisible ? 'overflow-visible' : ''}`}>
+                        <div className="bg-gray-50 p-2 rounded-lg mb-4 space-y-2">
+                            <Dropdown
+                                options={companyOptions}
+                                value={selectedCompany}
+                                onChange={setSelectedCompany}
+                                placeholder="Select Company"
+                                className="w-full"
+                            />
+                            <Dropdown
+                                options={difficultyOptions}
+                                value={selectedDifficulty}
+                                onChange={setSelectedDifficulty}
+                                placeholder="Select Difficulty"
+                                className="w-full"
+                            />
+                        </div>
                     </div>
-                )}
+                </div>
 
                 <CardView
                     qnas={paginatedQnA}
