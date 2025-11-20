@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AnimatedInput } from '../ui/AnimatedInput';
 import { motion } from 'framer-motion';
-import { mockUsers } from '../../services/mockData';
+import { mockUsers } from '../../data/mockData';
 
 interface LoginProps {
   onToggle: () => void;
