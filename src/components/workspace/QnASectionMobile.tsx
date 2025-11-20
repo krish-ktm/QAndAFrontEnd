@@ -8,6 +8,7 @@ import { EmptyState } from './EmptyState';
 import { CardView } from './CardView';
 import { Dropdown } from '../ui/Dropdown';
 import { TopicSelectorMobile } from './TopicSelectorMobile';
+import { PaginationMobile } from './PaginationMobile';
 
 interface QnASectionMobileProps {
     productId: string;
@@ -19,6 +20,8 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
     const [showFilters, setShowFilters] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     // State for API data
     const [topics, setTopics] = useState<Topic[]>([]);
@@ -54,6 +57,9 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
     // Fetch QnAs for the selected topic and apply bookmarks from mock data
     useEffect(() => {
         if (!selectedTopicId) return;
+
+        // Reset pagination when topic changes
+        setCurrentPage(1);
 
         const fetchQnAs = async () => {
             setLoadingTopicId(selectedTopicId);
@@ -113,6 +119,18 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
             return matchesCompany && matchesDifficulty;
         });
     }, [productQnA, selectedCompany, selectedDifficulty]);
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredQnA.length / itemsPerPage);
+    const paginatedQnA = filteredQnA.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCompany, selectedDifficulty]);
 
     const toggleExpand = (id: string) => {
         setExpandedIds(prev => {
@@ -175,19 +193,24 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
             <div className="p-4 flex-1 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-gray-900">Questions</h2>
-                    <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className={`p-2 rounded-lg transition-colors ${showFilters || selectedCompany !== 'all' || selectedDifficulty !== 'all'
-                            ? 'bg-blue-50 text-blue-600'
-                            : 'bg-gray-100 text-gray-600'
-                            }`}
-                    >
-                        <Filter className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 font-medium">
+                            {filteredQnA.length} found
+                        </span>
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`p-2 rounded-lg transition-colors ${showFilters || selectedCompany !== 'all' || selectedDifficulty !== 'all'
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'bg-gray-100 text-gray-600'
+                                }`}
+                        >
+                            <Filter className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
                 {showFilters && (
-                    <div className="bg-gray-50 p-4 rounded-lg mb-4 space-y-3 animate-in fade-in slide-in-from-top-2">
+                    <div className="bg-gray-50 p-2 rounded-lg mb-4 space-y-2 animate-in fade-in slide-in-from-top-2">
                         <Dropdown
                             options={companyOptions}
                             value={selectedCompany}
@@ -205,12 +228,8 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                     </div>
                 )}
 
-                <div className="mb-4 text-sm text-gray-500">
-                    {filteredQnA.length} questions found
-                </div>
-
                 <CardView
-                    qnas={filteredQnA}
+                    qnas={paginatedQnA}
                     expandedIds={expandedIds}
                     bookmarkedIds={bookmarkedIds}
                     toggleExpand={toggleExpand}
@@ -218,7 +237,15 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                     isLoading={loadingTopicId !== ''}
                 />
 
-                {filteredQnA.length === 0 && (
+                {filteredQnA.length > 0 && (
+                    <PaginationMobile
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                )}
+
+                {filteredQnA.length === 0 && !loadingTopicId && (
                     <EmptyState onClearFilters={handleClearFilters} />
                 )}
             </div>
