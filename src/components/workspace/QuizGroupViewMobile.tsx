@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Book, ChevronRight, BarChart2, Clock, Play } from 'lucide-react';
+import { Book, Clock, Play } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { QuizGroup } from '../../types/api';
+import { getDifficultyColor, formatDifficulty } from './utils/qnaUtils';
 
 interface QuizGroupViewMobileProps {
     productId: string;
@@ -82,11 +83,6 @@ export const QuizGroupViewMobile = ({ productId, onSelectQuizGroup }: QuizGroupV
 
     return (
         <div className="flex flex-col bg-gray-50 min-h-full">
-            <div className="p-4 pb-2 bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-                <h1 className="text-xl font-bold text-gray-900">Quiz Groups</h1>
-                <p className="text-sm text-gray-500">Select a topic to start practicing</p>
-            </div>
-
             <div className="p-4 space-y-3 pb-6">
                 {quizGroups.map((quizGroup, index) => (
                     <motion.div
@@ -113,25 +109,22 @@ export const QuizGroupViewMobile = ({ productId, onSelectQuizGroup }: QuizGroupV
 
                         <div className="relative z-10 flex items-center justify-between gap-3">
                             <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h2 className="text-base font-bold text-gray-900 truncate">
+                                <div className="flex items-start gap-2 mb-1">
+                                    <h2 className="text-base font-bold text-gray-900 line-clamp-2">
                                         {quizGroup.name}
                                     </h2>
-                                    {quizGroup.level && (
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide ${quizGroup.level.toLowerCase() === 'beginner' ? 'bg-green-100 text-green-700' :
-                                            quizGroup.level.toLowerCase() === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-red-100 text-red-700'
-                                            }`}>
-                                            {quizGroup.level}
-                                        </span>
-                                    )}
                                 </div>
 
                                 <p className="text-sm text-gray-500 line-clamp-2 mb-3 font-medium">
                                     {quizGroup.description}
                                 </p>
 
-                                <div className="flex items-center gap-3 text-xs text-gray-400 font-medium">
+                                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 font-medium">
+                                    {quizGroup.level && (
+                                        <span className={`px-2 py-0.5 text-xs font-semibold rounded-full border ${getDifficultyColor(quizGroup.level)}`}>
+                                            {formatDifficulty(quizGroup.level)}
+                                        </span>
+                                    )}
                                     <span className="flex items-center gap-1">
                                         <Clock className="w-3 h-3" />
                                         {quizGroup.estimatedDuration ? `${quizGroup.estimatedDuration}m` : '-'}

@@ -3,7 +3,7 @@ import { ArrowLeft, MessageSquare, Brain, FileText, Layers } from 'lucide-react'
 import { apiService } from '../../services/apiService';
 import { Product, Progress, Topic } from '../../types/api';
 import { QnASection } from './QnASection';
-import { QuizSection } from './QuizSection';
+import { QuizSectionMobile } from './QuizSectionMobile';
 import { PDFSection } from './PDFSection';
 import { FlashcardSection } from './FlashcardSection';
 
@@ -16,6 +16,7 @@ type Section = 'qna' | 'quiz' | 'pdf' | 'flashcards';
 
 export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => {
     const [activeSection, setActiveSection] = useState<Section>('qna');
+    const [quizView, setQuizView] = useState<'groups' | 'active'>('groups');
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -97,18 +98,37 @@ export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => 
         { id: 'flashcards' as Section, label: 'Cards', icon: Layers },
     ];
 
+    const handleBack = () => {
+        if (activeSection === 'quiz' && quizView === 'active') {
+            setQuizView('groups');
+        } else {
+            onBack();
+        }
+    };
+
+    const getHeaderTitle = () => {
+        if (activeSection === 'quiz' && quizView === 'active') {
+            return 'Quiz Challenge';
+        }
+        return (
+            <>
+                {product.name} <span className="text-gray-400 mx-1">|</span> {sections.find(s => s.id === activeSection)?.label}
+            </>
+        );
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Mobile Header */}
             <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
                 <button
-                    onClick={onBack}
+                    onClick={handleBack}
                     className="p-2 -ml-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
                 >
                     <ArrowLeft className="w-5 h-5" />
                 </button>
                 <h1 className="text-sm font-bold text-gray-900 truncate max-w-[200px]">
-                    {product.title}
+                    {getHeaderTitle()}
                 </h1>
                 <div className="w-8 h-8 flex items-center justify-center">
                     <div className="relative w-8 h-8 flex items-center justify-center">
@@ -144,7 +164,13 @@ export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => 
             {/* Main Content */}
             <main className="flex-1 overflow-y-auto pb-20">
                 {activeSection === 'qna' && <QnASection productId={productId} />}
-                {activeSection === 'quiz' && <QuizSection productId={productId} />}
+                {activeSection === 'quiz' && (
+                    <QuizSectionMobile
+                        productId={productId}
+                        view={quizView}
+                        onViewChange={setQuizView}
+                    />
+                )}
                 {activeSection === 'pdf' && <PDFSection productId={productId} />}
                 {activeSection === 'flashcards' && <FlashcardSection productId={productId} />}
             </main>

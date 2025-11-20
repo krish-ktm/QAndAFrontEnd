@@ -8,6 +8,8 @@ import { AnimatedPage } from '../ui/AnimatedPage';
 
 interface QuizSectionMobileProps {
     productId: string;
+    view: 'groups' | 'active';
+    onViewChange: (view: 'groups' | 'active') => void;
 }
 
 interface LocalQuizAttempt {
@@ -16,10 +18,7 @@ interface LocalQuizAttempt {
     isCorrect: boolean;
 }
 
-export const QuizSectionMobile = ({ productId }: QuizSectionMobileProps) => {
-    // Flow state
-    const [view, setView] = useState<'groups' | 'active'>('groups');
-
+export const QuizSectionMobile = ({ productId, view, onViewChange }: QuizSectionMobileProps) => {
     // Quiz state
     const [currentQuizIndex, setCurrentQuizIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -32,7 +31,7 @@ export const QuizSectionMobile = ({ productId }: QuizSectionMobileProps) => {
     const handleSelectQuizGroup = async (quizGroup: QuizGroup) => {
         try {
             setLoading(true);
-            setView('active'); // Switch view immediately to trigger transition
+            onViewChange('active'); // Switch view immediately to trigger transition
             const response = await apiService.getQuizzes(productId, { quizGroupId: quizGroup.id });
             if (response.success) {
                 setQuizzes(response.data.items);
@@ -41,12 +40,12 @@ export const QuizSectionMobile = ({ productId }: QuizSectionMobileProps) => {
                 setAttempts([]);
             } else {
                 setError(response.message || 'Failed to load quizzes');
-                setView('groups'); // Go back to groups on error
+                onViewChange('groups'); // Go back to groups on error
             }
         } catch (err) {
             console.error('Error fetching quizzes for group:', err);
             setError('An error occurred while loading quizzes');
-            setView('groups'); // Go back to groups on error
+            onViewChange('groups'); // Go back to groups on error
         } finally {
             setLoading(false);
         }
@@ -56,7 +55,7 @@ export const QuizSectionMobile = ({ productId }: QuizSectionMobileProps) => {
     const handleBackToGroups = () => {
         setLoading(true); // Add loading state for smoother transition
         setTimeout(() => {
-            setView('groups');
+            onViewChange('groups');
             setQuizzes([]);
             setCurrentQuizIndex(0);
             setSelectedAnswer(null);
@@ -334,38 +333,25 @@ export const QuizSectionMobile = ({ productId }: QuizSectionMobileProps) => {
     return (
         <AnimatedPage>
             <div className="flex flex-col h-full bg-gray-50">
-                <div className="px-4 pt-4 pb-3 bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] z-10">
-                    {/* Back Button */}
-                    <button
-                        onClick={handleBackToGroups}
-                        className="flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-4 transition-colors text-sm font-semibold group"
-                    >
-                        <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-                            <ArrowLeft className="w-4 h-4" />
+                {/* Status Bar */}
+                <div className="px-4 py-3 bg-white shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] z-10">
+                    <div className="flex items-end justify-between mb-2">
+                        <div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Progress</p>
                         </div>
-                        <span>Back to Groups</span>
-                    </button>
+                        <div className="flex flex-col items-end">
+                            <span className="text-lg font-bold text-blue-600 leading-none">
+                                {currentQuizIndex + 1}
+                                <span className="text-xs text-gray-400 font-medium ml-1">/ {totalQuizzes}</span>
+                            </span>
+                        </div>
+                    </div>
 
-                    <div className="mb-2">
-                        <div className="flex items-end justify-between mb-3">
-                            <div>
-                                <h1 className="text-xl font-extrabold text-gray-900 tracking-tight leading-none mb-1">Quiz Challenge</h1>
-                                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">Test your knowledge</p>
-                            </div>
-                            <div className="flex flex-col items-end">
-                                <span className="text-xl font-bold text-blue-600 leading-none">
-                                    {currentQuizIndex + 1}
-                                    <span className="text-xs text-gray-500 font-medium ml-1">/ {totalQuizzes}</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                            <div
-                                className="bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(37,99,235,0.3)]"
-                                style={{ width: `${((currentQuizIndex + 1) / totalQuizzes) * 100}%` }}
-                            />
-                        </div>
+                    <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                        <div
+                            className="bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(37,99,235,0.3)]"
+                            style={{ width: `${((currentQuizIndex + 1) / totalQuizzes) * 100}%` }}
+                        />
                     </div>
                 </div>
 
