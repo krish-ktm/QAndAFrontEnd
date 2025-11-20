@@ -103,6 +103,7 @@ export const WorkspaceDesktop = ({ productId, onBack }: WorkspaceDesktopProps) =
             <aside
                 className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out relative z-20 ${isSidebarHovered ? 'w-64' : 'w-16'
                     }`}
+                style={{ willChange: 'width' }}
                 onMouseEnter={() => setIsSidebarHovered(true)}
                 onMouseLeave={() => setIsSidebarHovered(false)}
             >
@@ -132,8 +133,8 @@ export const WorkspaceDesktop = ({ productId, onBack }: WorkspaceDesktopProps) =
                                     <button
                                         onClick={() => setActiveSection(section.id)}
                                         className={`w-full flex items-center gap-3 rounded-lg transition overflow-hidden ${isActive
-                                                ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
+                                            ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600'
+                                            : 'text-gray-600 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
                                             } ${isSidebarHovered ? 'px-4 py-3' : 'justify-center w-12 h-12'}`}
                                         title={section.label}
                                     >

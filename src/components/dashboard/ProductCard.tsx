@@ -11,7 +11,7 @@ interface ProductCardProps {
 export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
   const [progress, setProgress] = useState<number>(0);
   const [tags, setTags] = useState<string[]>([]);
-  
+
   useEffect(() => {
     const loadProgress = async () => {
       try {
@@ -50,7 +50,7 @@ export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
     if (product.name.includes('System')) generatedTags.push('System Design');
     if (product.name.includes('Algorithm')) generatedTags.push('Algorithms');
     if (product.description.includes('interview')) generatedTags.push('Interview Prep');
-    
+
     setTags(generatedTags.length > 0 ? generatedTags : ['Learning']);
   }, [product]);
   return (
@@ -84,7 +84,7 @@ export const ProductCard = ({ product, onSelect }: ProductCardProps) => {
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div
               className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${progress}%`, willChange: 'width' }}
             />
           </div>
         </div>

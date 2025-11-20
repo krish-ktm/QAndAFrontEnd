@@ -350,7 +350,7 @@ export const QuizSectionMobile = ({ productId, view, onViewChange }: QuizSection
                     <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                         <div
                             className="bg-gradient-to-r from-blue-600 to-blue-400 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(37,99,235,0.3)]"
-                            style={{ width: `${((currentQuizIndex + 1) / totalQuizzes) * 100}%` }}
+                            style={{ width: `${((currentQuizIndex + 1) / totalQuizzes) * 100}%`, willChange: 'width' }}
                         />
                     </div>
                 </div>

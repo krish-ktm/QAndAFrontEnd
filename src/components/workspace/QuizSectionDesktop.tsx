@@ -257,22 +257,22 @@ export const QuizSectionDesktop = ({ productId }: QuizSectionDesktopProps) => {
                                                     <div
                                                         key={optionIndex}
                                                         className={`flex items-center p-3 rounded-lg border ${isCorrectAnswer
-                                                                ? 'bg-green-50 border-green-200'
-                                                                : isUserSelection
-                                                                    ? 'bg-red-50 border-red-200'
-                                                                    : 'bg-gray-50 border-gray-200'
+                                                            ? 'bg-green-50 border-green-200'
+                                                            : isUserSelection
+                                                                ? 'bg-red-50 border-red-200'
+                                                                : 'bg-gray-50 border-gray-200'
                                                             }`}
                                                     >
                                                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-sm font-medium mr-3 ${isCorrectAnswer
-                                                                ? 'bg-green-200 text-green-800'
-                                                                : isUserSelection
-                                                                    ? 'bg-red-200 text-red-800'
-                                                                    : 'bg-gray-200 text-gray-600'
+                                                            ? 'bg-green-200 text-green-800'
+                                                            : isUserSelection
+                                                                ? 'bg-red-200 text-red-800'
+                                                                : 'bg-gray-200 text-gray-600'
                                                             }`}>
                                                             {optionLetter}
                                                         </span>
                                                         <span className={`flex-1 ${isCorrectAnswer ? 'text-green-900 font-medium' :
-                                                                isUserSelection ? 'text-red-900' : 'text-gray-700'
+                                                            isUserSelection ? 'text-red-900' : 'text-gray-700'
                                                             }`}>
                                                             {option}
                                                         </span>
@@ -395,7 +395,7 @@ export const QuizSectionDesktop = ({ productId }: QuizSectionDesktopProps) => {
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                                 className="bg-blue-600 h-full rounded-full transition-all duration-300"
-                                style={{ width: `${((currentQuizIndex + 1) / totalQuizzes) * 100}%` }}
+                                style={{ width: `${((currentQuizIndex + 1) / totalQuizzes) * 100}%`, willChange: 'width' }}
                             />
                         </div>
                     </div>
