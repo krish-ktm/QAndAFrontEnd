@@ -139,6 +139,8 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        // Also scroll window to top to ensure full visibility
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentPage]);
 
     const toggleExpand = (id: string) => {
