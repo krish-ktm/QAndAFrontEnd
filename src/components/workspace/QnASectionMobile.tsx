@@ -7,6 +7,7 @@ import { ErrorState } from './ErrorState';
 import { EmptyState } from './EmptyState';
 import { CardView } from './CardView';
 import { Dropdown } from '../ui/Dropdown';
+import { TopicSelectorMobile } from './TopicSelectorMobile';
 
 interface QnASectionMobileProps {
     productId: string;
@@ -164,23 +165,12 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
 
     return (
         <div className="flex flex-col h-full">
-            {/* Topic Selection - Horizontal Scroll */}
-            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-                <div className="flex overflow-x-auto p-3 gap-2 no-scrollbar">
-                    {topics.map((topic) => (
-                        <button
-                            key={topic.id}
-                            onClick={() => setSelectedTopicId(topic.id)}
-                            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedTopicId === topic.id
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                }`}
-                        >
-                            {topic.name}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            {/* Topic Selector - Sticky Header */}
+            <TopicSelectorMobile
+                topics={topics}
+                selectedTopicId={selectedTopicId}
+                onSelectTopic={setSelectedTopicId}
+            />
 
             <div className="p-4 flex-1 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
@@ -188,8 +178,8 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                     <button
                         onClick={() => setShowFilters(!showFilters)}
                         className={`p-2 rounded-lg transition-colors ${showFilters || selectedCompany !== 'all' || selectedDifficulty !== 'all'
-                                ? 'bg-blue-50 text-blue-600'
-                                : 'bg-gray-100 text-gray-600'
+                            ? 'bg-blue-50 text-blue-600'
+                            : 'bg-gray-100 text-gray-600'
                             }`}
                     >
                         <Filter className="w-5 h-5" />
