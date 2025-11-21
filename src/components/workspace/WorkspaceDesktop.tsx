@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, MessageSquare, Brain, FileText, Layers } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Brain, FileText, Layers, Compass } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Product, Progress, Topic } from '../../types/api';
 import { QnASection } from './QnASection';
 import { QuizSection } from './QuizSection';
 import { PDFSection } from './PDFSection';
 import { FlashcardSection } from './FlashcardSection';
+import { RoadmapList } from '../roadmaps/RoadmapList';
+import { RoadmapView } from '../roadmaps/RoadmapView';
 
 interface WorkspaceDesktopProps {
     productId: string;
     onBack: () => void;
 }
 
-type Section = 'qna' | 'quiz' | 'pdf' | 'flashcards';
+type Section = 'qna' | 'quiz' | 'pdf' | 'flashcards' | 'roadmaps';
 
 export const WorkspaceDesktop = ({ productId, onBack }: WorkspaceDesktopProps) => {
     const [activeSection, setActiveSection] = useState<Section>('qna');
+    const [selectedRoadmapId, setSelectedRoadmapId] = useState<string | null>(null);
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -96,6 +99,7 @@ export const WorkspaceDesktop = ({ productId, onBack }: WorkspaceDesktopProps) =
         { id: 'quiz' as Section, label: 'Quizzes', icon: Brain },
         { id: 'pdf' as Section, label: 'Resources', icon: FileText },
         { id: 'flashcards' as Section, label: 'Flashcards', icon: Layers },
+        { id: 'roadmaps' as Section, label: 'Roadmaps', icon: Compass },
     ];
 
     return (
@@ -131,7 +135,11 @@ export const WorkspaceDesktop = ({ productId, onBack }: WorkspaceDesktopProps) =
                             return (
                                 <li key={section.id}>
                                     <button
-                                        onClick={() => setActiveSection(section.id)}
+                                        onClick={() => {
+                                            setActiveSection(section.id);
+                                            // Reset nested views when switching sections
+                                            if (section.id !== 'roadmaps') setSelectedRoadmapId(null);
+                                        }}
                                         className={`w-full flex items-center gap-3 rounded-lg transition overflow-hidden ${isActive
                                             ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600'
                                             : 'text-gray-600 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
@@ -172,6 +180,19 @@ export const WorkspaceDesktop = ({ productId, onBack }: WorkspaceDesktopProps) =
                 {activeSection === 'quiz' && <QuizSection productId={productId} />}
                 {activeSection === 'pdf' && <PDFSection productId={productId} />}
                 {activeSection === 'flashcards' && <FlashcardSection productId={productId} />}
+                {activeSection === 'roadmaps' && (
+                    selectedRoadmapId ? (
+                        <RoadmapView
+                            roadmapId={selectedRoadmapId}
+                            onBack={() => setSelectedRoadmapId(null)}
+                        />
+                    ) : (
+                        <RoadmapList
+                            productId={productId}
+                            onSelectRoadmap={setSelectedRoadmapId}
+                        />
+                    )
+                )}
             </main>
         </div>
     );

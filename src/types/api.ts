@@ -151,7 +151,7 @@ export interface Quiz {
   correctAnswer: string;
   explanation: string;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-   estimatedTime?: number; // in minutes
+  estimatedTime?: number; // in minutes
   companyTags: string[];
   createdAt: string;
   updatedAt: string;
@@ -226,4 +226,42 @@ export interface PasswordResetToken {
   userId: string;
   token: string;
   expiresAt: string;
+}
+
+// Roadmap Types
+export interface Roadmap {
+  id: string;
+  productId: string;
+  title: string;
+  description: string;
+  type: 'LEARNING_PATH' | 'DECISION_TREE';
+  nodes: RoadmapNode[];
+  edges: RoadmapEdge[];
+}
+
+export interface RoadmapNode {
+  id: string;
+  type: 'start' | 'end' | 'milestone' | 'decision' | 'note' | 'group';
+  position: { x: number; y: number };
+  data: {
+    label: string;
+    content?: string; // Markdown supported detailed info
+    style?: {
+      shape?: 'rectangle' | 'rounded' | 'circle' | 'diamond';
+      backgroundColor?: string;
+      textColor?: string;
+      borderColor?: string;
+    };
+  };
+}
+
+export interface RoadmapEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  animated?: boolean;
+  style?: React.CSSProperties;
+  sourceHandle?: string;
+  targetHandle?: string;
 }

@@ -84,7 +84,7 @@ export const QuizGroupViewMobile = ({ productId, onSelectQuizGroup }: QuizGroupV
     return (
         <div className="flex flex-col bg-gray-50 min-h-full">
             <div className="p-4 space-y-3 pb-6">
-                {quizGroups.map((quizGroup, index) => (
+                {quizGroups.map((quizGroup) => (
                     <motion.div
                         key={quizGroup.id}
                         initial={{ opacity: 0, y: 10 }}

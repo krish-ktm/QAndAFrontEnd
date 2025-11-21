@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shuffle, RotateCw, BookOpen, Filter } from 'lucide-react';
 import { apiService } from '../../services/apiService';
 import { Flashcard, Topic } from '../../types/api';
 import { FlashcardCard } from './FlashcardCard';

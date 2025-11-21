@@ -10,7 +10,11 @@ export const HeaderDesktop = () => {
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center gap-3">
                         <BookOpen className="w-8 h-8 text-blue-600" />
-                        <h1 className="text-xl font-bold text-gray-900">LearnHub</h1>
+                        <h1 className="text-xl font-bold text-gray-900 mr-8">LearnHub</h1>
+
+                        <nav className="flex gap-4">
+                            <a href="/" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Dashboard</a>
+                        </nav>
                     </div>
 
                     <div className="flex items-center gap-4">
