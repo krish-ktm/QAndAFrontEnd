@@ -241,11 +241,29 @@ export interface Roadmap {
 
 export interface RoadmapNode {
   id: string;
-  type: 'start' | 'end' | 'milestone' | 'decision' | 'note' | 'group';
+  type: 'start' | 'end' | 'milestone' | 'decision' | 'note' | 'group' | 'info' | 'code' | 'video' | 'checklist' | 'quiz' | 'resource';
   position: { x: number; y: number };
+  parentNode?: string;
+  extent?: 'parent';
+  style?: React.CSSProperties;
   data: {
     label: string;
     content?: string; // Markdown supported detailed info
+    subLabel?: string;
+    image?: string;
+    tags?: { text: string; color?: string }[];
+    items?: string[];
+    link?: string;
+    language?: string;
+    code?: string;
+    videoUrl?: string;
+    description?: string;
+    question?: string;
+    options?: string[];
+    correctAnswer?: number;
+    explanation?: string;
+    resources?: { type: 'pdf' | 'link' | 'github' | 'video' | 'download'; title: string; url: string }[];
+    clickAction?: 'open-drawer' | 'none'; // Control click behavior
     style?: {
       shape?: 'rectangle' | 'rounded' | 'circle' | 'diamond';
       backgroundColor?: string;
@@ -264,4 +282,7 @@ export interface RoadmapEdge {
   style?: React.CSSProperties;
   sourceHandle?: string;
   targetHandle?: string;
+  type?: string;
+  markerEnd?: any;
+  markerStart?: any;
 }

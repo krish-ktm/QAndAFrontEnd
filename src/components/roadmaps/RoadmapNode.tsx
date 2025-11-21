@@ -4,63 +4,63 @@ import { Handle, Position, NodeProps } from '@xyflow/react';
 export const RoadmapNode = memo(({ data, selected }: NodeProps) => {
     const style = (data.style as any) || {};
     const shape = style.shape || 'rectangle';
-    const bgColor = style.backgroundColor || '#fef3c7';
-    const borderColor = style.borderColor || '#d97706';
-    const textColor = style.textColor || '#111827';
+    const bgColor = style.backgroundColor || '#ffffff';
+    const borderColor = style.borderColor || '#e2e8f0';
+    const textColor = style.textColor || '#0f172a';
 
     const isDiamond = shape === 'diamond';
     const isCircle = shape === 'circle';
     const isRounded = shape === 'rounded';
 
     // Wrapper Dimensions
-    // Diamond needs a square wrapper.
-    // Others can be rectangular.
-    const widthClass = isDiamond || isCircle ? 'w-48 h-48' : 'w-64 h-auto min-h-[4rem]';
+    // Diamond/Circle needs a square wrapper (w-48 = 192px).
+    // Others can be rectangular (w-64 = 256px).
+    const widthClass = isDiamond || isCircle ? 'w-48 h-48' : 'w-64 min-h-[100px]';
 
     return (
         <div className={`relative group flex items-center justify-center ${widthClass}`}>
 
             {/* SVG Shape Layer */}
-            <div className="absolute inset-0 w-full h-full pointer-events-none filter drop-shadow-sm transition-all duration-200 group-hover:drop-shadow-md">
-                <svg
-                    viewBox="0 0 100 100"
-                    className="w-full h-full overflow-visible"
-                    preserveAspectRatio="none"
-                >
-                    {isDiamond && (
-                        <polygon
-                            points="50,0 100,50 50,100 0,50"
-                            fill={bgColor}
-                            stroke={selected ? '#3b82f6' : borderColor}
-                            strokeWidth="1.5"
-                            strokeLinejoin="round"
-                        />
-                    )}
-                    {isCircle && (
-                        <circle
-                            cx="50" cy="50" r="49"
-                            fill={bgColor}
-                            stroke={selected ? '#3b82f6' : borderColor}
-                            strokeWidth="1.5"
-                        />
-                    )}
-                    {isRounded && (
-                        <rect
-                            x="1" y="1" width="98" height="98" rx="15" ry="15"
-                            fill={bgColor}
-                            stroke={selected ? '#3b82f6' : borderColor}
-                            strokeWidth="1.5"
-                        />
-                    )}
-                    {!isDiamond && !isCircle && !isRounded && (
-                        <rect
-                            x="1" y="1" width="98" height="98" rx="3" ry="3"
-                            fill={bgColor}
-                            stroke={selected ? '#3b82f6' : borderColor}
-                            strokeWidth="1.5"
-                        />
-                    )}
-                </svg>
+            {/* Shape Layer */}
+            <div className={`absolute inset-0 w-full h-full pointer-events-none transition-all duration-200 ${isDiamond || isCircle
+                ? 'filter drop-shadow-sm group-hover:drop-shadow-md'
+                : 'shadow-sm group-hover:shadow-md'
+                }`}
+                style={
+                    !isDiamond && !isCircle ? {
+                        backgroundColor: bgColor,
+                        borderColor: selected ? '#3b82f6' : borderColor,
+                        borderWidth: '1.5px',
+                        borderStyle: 'solid',
+                        borderRadius: isRounded ? '15px' : '6px',
+                    } : {}
+                }
+            >
+                {(isDiamond || isCircle) && (
+                    <svg
+                        viewBox="0 0 100 100"
+                        className="w-full h-full overflow-visible"
+                        preserveAspectRatio="none"
+                    >
+                        {isDiamond && (
+                            <polygon
+                                points="50,0 100,50 50,100 0,50"
+                                fill={bgColor}
+                                stroke={selected ? '#3b82f6' : borderColor}
+                                strokeWidth="1.5"
+                                strokeLinejoin="round"
+                            />
+                        )}
+                        {isCircle && (
+                            <circle
+                                cx="50" cy="50" r="49"
+                                fill={bgColor}
+                                stroke={selected ? '#3b82f6' : borderColor}
+                                strokeWidth="1.5"
+                            />
+                        )}
+                    </svg>
+                )}
             </div>
 
             {/* Content Layer */}

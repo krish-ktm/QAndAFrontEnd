@@ -20,6 +20,14 @@ import { RoadmapNode } from './RoadmapNode';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
 import { RoadmapNote } from './RoadmapNote';
+import { RoadmapInfoNode } from './RoadmapInfoNode';
+import { RoadmapCodeNode } from './RoadmapCodeNode';
+import { RoadmapGroupNode } from './RoadmapGroupNode';
+import { RoadmapVideoNode } from './RoadmapVideoNode';
+import { RoadmapChecklistNode } from './RoadmapChecklistNode';
+import { RoadmapQuizNode } from './RoadmapQuizNode';
+import { RoadmapResourceNode } from './RoadmapResourceNode';
+import { SimpleFloatingEdge } from './edges/SimpleFloatingEdge';
 
 // Define custom node types
 const nodeTypes = {
@@ -28,20 +36,24 @@ const nodeTypes = {
     milestone: RoadmapNode,
     decision: RoadmapNode,
     note: RoadmapNote,
-    // For groups, we can use the default 'group' type or a custom one.
-    // React Flow has a default group, but we might want to style it.
-    // Let's use a simple custom group for now or just rely on default?
-    // Default group is just a node. Let's use RoadmapNode for consistency but maybe style it differently?
-    // Actually, let's just use the default 'group' type provided by React Flow if we don't define it, 
-    // OR define a simple container.
-    // Let's define 'group' as a RoadmapNode for now, but it will need to be styled as a container.
-    // Actually, let's leave 'group' undefined here so it falls back to default (if any) or we define a simple one.
-    // Better: Define a custom GroupNode if needed. For now, let's just use 'note'.
-    // Wait, user asked for Groups. I should probably add a simple Group component.
+    info: RoadmapInfoNode,
+    code: RoadmapCodeNode,
+    group: RoadmapGroupNode,
+    video: RoadmapVideoNode,
+    checklist: RoadmapChecklistNode,
+    quiz: RoadmapQuizNode,
+    resource: RoadmapResourceNode,
 };
 
-const NODE_WIDTH = 300;
-const NODE_HEIGHT = 150;
+const edgeTypes = {
+    floating: SimpleFloatingEdge,
+};
+
+const SQUARE_SIZE = 192; // w-48
+const RECT_WIDTH = 256;  // w-64
+const RECT_HEIGHT = 100; // Approximate height for rectangles
+const INFO_WIDTH = 288;  // w-72
+const CODE_WIDTH = 320;  // w-80
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
     const dagreGraph = new dagre.graphlib.Graph();
@@ -51,7 +63,44 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
-        dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
+        const style = (node.data.style as any) || {};
+        const shape = style.shape || 'rectangle';
+        const isSquare = shape === 'diamond' || shape === 'circle';
+        const isInfo = node.type === 'info';
+        const isCode = node.type === 'code';
+        const isGroup = node.type === 'group';
+        const isVideo = node.type === 'video';
+        const isChecklist = node.type === 'checklist';
+        const isQuiz = node.type === 'quiz';
+        const isResource = node.type === 'resource';
+
+        let width = isSquare ? SQUARE_SIZE : RECT_WIDTH;
+        let height = isSquare ? SQUARE_SIZE : RECT_HEIGHT;
+
+        if (isInfo) {
+            width = INFO_WIDTH;
+            height = 400;
+        } else if (isCode) {
+            width = CODE_WIDTH;
+            height = 200;
+        } else if (isGroup) {
+            width = 400;
+            height = 300;
+        } else if (isVideo) {
+            width = 320;
+            height = 300;
+        } else if (isChecklist) {
+            width = 288;
+            height = 300;
+        } else if (isQuiz) {
+            width = 320;
+            height = 400;
+        } else if (isResource) {
+            width = 288;
+            height = 300;
+        }
+
+        dagreGraph.setNode(node.id, { width, height });
     });
 
     edges.forEach((edge) => {
@@ -62,6 +111,37 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
 
     const newNodes = nodes.map((node) => {
         const nodeWithPosition = dagreGraph.node(node.id);
+
+        // Re-calculate dimensions for this specific node to ensure consistency
+        const style = (node.data.style as any) || {};
+        const shape = style.shape || 'rectangle';
+        const isSquare = shape === 'diamond' || shape === 'circle';
+        const isInfo = node.type === 'info';
+        const isCode = node.type === 'code';
+        const isGroup = node.type === 'group';
+        const isVideo = node.type === 'video';
+        const isChecklist = node.type === 'checklist';
+
+        let width = isSquare ? SQUARE_SIZE : RECT_WIDTH;
+        let height = isSquare ? SQUARE_SIZE : RECT_HEIGHT;
+
+        if (isInfo) {
+            width = INFO_WIDTH;
+            height = 400;
+        } else if (isCode) {
+            width = CODE_WIDTH;
+            height = 200;
+        } else if (isGroup) {
+            width = 400;
+            height = 300;
+        } else if (isVideo) {
+            width = 320;
+            height = 300;
+        } else if (isChecklist) {
+            width = 288;
+            height = 300;
+        }
+
         return {
             ...node,
             targetPosition: isHorizontal ? Position.Left : Position.Top,
@@ -69,9 +149,11 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
             // We are shifting the dagre node position (anchor=center center) to the top left
             // so it matches the React Flow node anchor point (top left).
             position: {
-                x: nodeWithPosition.x - NODE_WIDTH / 2,
-                y: nodeWithPosition.y - NODE_HEIGHT / 2,
+                x: nodeWithPosition.x - width / 2,
+                y: nodeWithPosition.y - height / 2,
             },
+            width,
+            height,
         };
     });
 
@@ -101,11 +183,11 @@ const RoadmapTreeContent: React.FC<RoadmapTreeViewProps> = ({ roadmap, onNodeCli
         setNodes(layoutedNodes);
         setEdges(layoutedEdges.map(e => ({
             ...e,
-            type: 'smoothstep',
-            animated: false, // Dotted lines don't need animation usually, but can keep if desired. Let's keep it static for roadmap.sh look or animated? Roadmap.sh has static dotted.
-            // Actually roadmap.sh edges are often dotted.
-            style: { stroke: '#94a3b8', strokeWidth: 2, strokeDasharray: '5,5' }, // Slate-400, dotted
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#94a3b8' },
+            type: e.type || 'smoothstep', // Use provided type or default to smoothstep
+            animated: e.animated || false,
+            style: e.style || { stroke: '#94a3b8', strokeWidth: 2, strokeDasharray: '5,5' },
+            markerEnd: e.markerEnd || { type: MarkerType.ArrowClosed, color: '#94a3b8' },
+            markerStart: e.markerStart,
         })));
 
         // Wait for render then fit view
@@ -126,6 +208,7 @@ const RoadmapTreeContent: React.FC<RoadmapTreeViewProps> = ({ roadmap, onNodeCli
             onEdgesChange={onEdgesChange}
             onNodeClick={handleNodeClick}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             fitView
             attributionPosition="bottom-right"
             proOptions={{ hideAttribution: true }}

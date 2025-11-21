@@ -40,8 +40,28 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) =
     }
 
     const handleNodeClick = (node: Node) => {
-        setSelectedNode(node);
-        setIsDrawerOpen(true);
+        const nodeData = node.data as any;
+        const type = node.type;
+
+        // Determine action based on type and explicit configuration
+        let shouldOpenDrawer = true;
+
+        // Default behaviors by type
+        if (['video', 'checklist', 'quiz', 'resource', 'group'].includes(type || '')) {
+            shouldOpenDrawer = false;
+        }
+
+        // Explicit override
+        if (nodeData.clickAction === 'open-drawer') {
+            shouldOpenDrawer = true;
+        } else if (nodeData.clickAction === 'none') {
+            shouldOpenDrawer = false;
+        }
+
+        if (shouldOpenDrawer) {
+            setSelectedNode(node);
+            setIsDrawerOpen(true);
+        }
     };
 
     return (

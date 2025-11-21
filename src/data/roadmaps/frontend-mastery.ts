@@ -14,7 +14,7 @@ export const frontendMastery: Roadmap = {
             data: {
                 label: 'Start Here',
                 content: '# Welcome to Frontend Mastery\n\nThis path will take you through everything you need to know to ace your frontend interviews.\n\n**Prerequisites:**\n- Basic JavaScript knowledge\n- A code editor (VS Code recommended)',
-                style: { shape: 'rounded', backgroundColor: '#fef3c7', borderColor: '#d97706' }
+                style: { shape: 'rounded' }
             }
         },
         {
