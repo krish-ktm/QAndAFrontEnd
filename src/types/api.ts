@@ -241,7 +241,7 @@ export interface Roadmap {
 
 export interface RoadmapNode {
   id: string;
-  type: 'start' | 'end' | 'milestone' | 'decision' | 'note' | 'group' | 'info' | 'code' | 'video' | 'checklist' | 'quiz' | 'resource';
+  type: 'start' | 'end' | 'milestone' | 'decision' | 'note' | 'group' | 'info' | 'code' | 'video' | 'checklist' | 'quiz' | 'resource' | 'service' | 'database' | 'queue' | 'uml' | 'math';
   position: { x: number; y: number };
   parentNode?: string;
   extent?: 'parent';
@@ -263,6 +263,22 @@ export interface RoadmapNode {
     correctAnswer?: number;
     explanation?: string;
     resources?: { type: 'pdf' | 'link' | 'github' | 'video' | 'download'; title: string; url: string }[];
+    // System Design Props
+    endpoints?: string[];
+    status?: 'healthy' | 'degraded' | 'down' | 'unknown';
+    version?: string;
+    techStack?: string[];
+    dbType?: string;
+    connectionStatus?: 'active' | 'inactive';
+    shards?: number;
+    queueType?: string;
+    messageCount?: number;
+    consumers?: number;
+    // General CS Props
+    attributes?: string[];
+    methods?: string[];
+    equation?: string;
+
     clickAction?: 'open-drawer' | 'none'; // Control click behavior
     style?: {
       shape?: 'rectangle' | 'rounded' | 'circle' | 'diamond';

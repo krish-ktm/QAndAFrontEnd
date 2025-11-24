@@ -28,6 +28,12 @@ import { RoadmapChecklistNode } from './RoadmapChecklistNode';
 import { RoadmapQuizNode } from './RoadmapQuizNode';
 import { RoadmapResourceNode } from './RoadmapResourceNode';
 import { SimpleFloatingEdge } from './edges/SimpleFloatingEdge';
+import { RoadmapServiceNode } from './RoadmapServiceNode';
+import { RoadmapDatabaseNode } from './RoadmapDatabaseNode';
+import { RoadmapQueueNode } from './RoadmapQueueNode';
+
+import { RoadmapUMLNode } from './RoadmapUMLNode';
+import { RoadmapMathNode } from './RoadmapMathNode';
 
 // Define custom node types
 const nodeTypes = {
@@ -43,12 +49,16 @@ const nodeTypes = {
     checklist: RoadmapChecklistNode,
     quiz: RoadmapQuizNode,
     resource: RoadmapResourceNode,
+    service: RoadmapServiceNode,
+    database: RoadmapDatabaseNode,
+    queue: RoadmapQueueNode,
+    uml: RoadmapUMLNode,
+    math: RoadmapMathNode,
 };
 
 const edgeTypes = {
     floating: SimpleFloatingEdge,
 };
-
 const SQUARE_SIZE = 192; // w-48
 const RECT_WIDTH = 256;  // w-64
 const RECT_HEIGHT = 100; // Approximate height for rectangles

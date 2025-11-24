@@ -4,6 +4,8 @@ import { reactMastery } from './react-mastery';
 import { pythonBasics } from './python-basics';
 import { featureShowcase } from './feature-showcase';
 import { microservicesArchitecture } from './microservices-architecture';
+import { systemDesignEcommerce } from './system-design-ecommerce';
+import { csTheoryConcepts } from './cs-theory-concepts';
 import { Roadmap } from '../../types/api';
 
 export const roadmaps: Roadmap[] = [
@@ -12,7 +14,9 @@ export const roadmaps: Roadmap[] = [
     reactMastery,
     pythonBasics,
     featureShowcase,
-    microservicesArchitecture
+    microservicesArchitecture,
+    systemDesignEcommerce,
+    csTheoryConcepts
 ];
 
 export const getRoadmapById = (id: string): Roadmap | undefined => {
