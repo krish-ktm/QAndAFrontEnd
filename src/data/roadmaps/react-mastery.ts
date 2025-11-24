@@ -81,13 +81,13 @@ export const reactMastery: Roadmap = {
         }
     ],
     edges: [
-        { id: 'e1-2', source: '1', target: '2', animated: true },
-        { id: 'e2-3', source: '2', target: '3', animated: true },
-        { id: 'e3-4', source: '3', target: '4', animated: true },
-        { id: 'e4-5', source: '4', target: '5', animated: true, label: 'Complex State' },
-        { id: 'e4-6', source: '4', target: '6', animated: true, label: 'Server State' },
-        { id: 'e5-7', source: '5', target: '7', animated: true },
-        { id: 'e6-7', source: '6', target: '7', animated: true },
-        { id: 'e7-8', source: '7', target: '8', animated: true }
+        { id: 'e1-2', source: '1', target: '2', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e2-3', source: '2', target: '3', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e3-4', source: '3', target: '4', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e4-5', source: '4', target: '5', animated: true, label: 'Complex State', sourceHandle: 'left-source', targetHandle: 'top-target' },
+        { id: 'e4-6', source: '4', target: '6', animated: true, label: 'Server State', sourceHandle: 'right-source', targetHandle: 'top-target' },
+        { id: 'e5-7', source: '5', target: '7', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e6-7', source: '6', target: '7', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e7-8', source: '7', target: '8', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' }
     ]
 };

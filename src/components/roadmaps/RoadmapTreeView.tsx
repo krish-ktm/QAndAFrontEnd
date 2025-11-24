@@ -34,6 +34,7 @@ import { RoadmapQueueNode } from './RoadmapQueueNode';
 
 import { RoadmapUMLNode } from './RoadmapUMLNode';
 import { RoadmapMathNode } from './RoadmapMathNode';
+import { RoadmapLinkedListNode } from './RoadmapLinkedListNode';
 
 // Define custom node types
 const nodeTypes = {
@@ -54,6 +55,7 @@ const nodeTypes = {
     queue: RoadmapQueueNode,
     uml: RoadmapUMLNode,
     math: RoadmapMathNode,
+    linkedList: RoadmapLinkedListNode,
 };
 
 const edgeTypes = {
@@ -108,6 +110,9 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
         } else if (isResource) {
             width = 288;
             height = 300;
+        } else if (node.type === 'linkedList') {
+            width = 180;
+            height = 80;
         }
 
         dagreGraph.setNode(node.id, { width, height });
@@ -150,6 +155,9 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
         } else if (isChecklist) {
             width = 288;
             height = 300;
+        } else if (node.type === 'linkedList') {
+            width = 180;
+            height = 80;
         }
 
         return {

@@ -76,7 +76,7 @@ export const dpProblems: Roadmap = {
             id: 'e2-3',
             source: '2',
             target: '3',
-            sourceHandle: 'left',
+            sourceHandle: 'left-source',
             label: 'Yes',
             style: { stroke: '#9333ea' }
         },
@@ -84,7 +84,7 @@ export const dpProblems: Roadmap = {
             id: 'e2-4',
             source: '2',
             target: '4',
-            sourceHandle: 'right',
+            sourceHandle: 'right-source',
             label: 'No',
             style: { stroke: '#dc2626' }
         },
@@ -94,7 +94,7 @@ export const dpProblems: Roadmap = {
             id: 'e3-5',
             source: '3',
             target: '5',
-            sourceHandle: 'bottom', // Flow down for final Yes
+            sourceHandle: 'bottom-source', // Flow down for final Yes
             label: 'Yes',
             style: { stroke: '#16a34a' }
         },
@@ -102,7 +102,7 @@ export const dpProblems: Roadmap = {
             id: 'e3-4',
             source: '3',
             target: '4',
-            sourceHandle: 'right', // Flow right to the "Not DP" bucket
+            sourceHandle: 'right-source', // Flow right to the "Not DP" bucket
             label: 'No',
             style: { stroke: '#dc2626' }
         }

@@ -95,12 +95,12 @@ export const systemDesignEcommerce: Roadmap = {
         }
     ],
     edges: [
-        { id: 'e1', source: 'client', target: 'api-gateway', type: 'smoothstep', animated: true },
-        { id: 'e2', source: 'api-gateway', target: 'order-service', type: 'smoothstep', animated: true },
-        { id: 'e3', source: 'order-service', target: 'order-queue', type: 'smoothstep', animated: true, label: 'OrderPlaced' },
-        { id: 'e4', source: 'order-queue', target: 'inventory-service', type: 'smoothstep' },
-        { id: 'e5', source: 'order-queue', target: 'notification-service', type: 'smoothstep' },
-        { id: 'e6', source: 'inventory-service', target: 'inventory-db', type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed } },
-        { id: 'e7', source: 'notification-service', target: 'email-provider', type: 'smoothstep', style: { strokeDasharray: '5,5' } }
+        { id: 'e1', source: 'client', target: 'api-gateway', type: 'smoothstep', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e2', source: 'api-gateway', target: 'order-service', type: 'smoothstep', animated: true, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e3', source: 'order-service', target: 'order-queue', type: 'smoothstep', animated: true, label: 'OrderPlaced', sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e4', source: 'order-queue', target: 'inventory-service', type: 'smoothstep', sourceHandle: 'left-source', targetHandle: 'top-target' },
+        { id: 'e5', source: 'order-queue', target: 'notification-service', type: 'smoothstep', sourceHandle: 'right-source', targetHandle: 'top-target' },
+        { id: 'e6', source: 'inventory-service', target: 'inventory-db', type: 'smoothstep', markerEnd: { type: MarkerType.ArrowClosed }, sourceHandle: 'bottom-source', targetHandle: 'top-target' },
+        { id: 'e7', source: 'notification-service', target: 'email-provider', type: 'smoothstep', style: { strokeDasharray: '5,5' }, sourceHandle: 'bottom-source', targetHandle: 'top-target' }
     ]
 };

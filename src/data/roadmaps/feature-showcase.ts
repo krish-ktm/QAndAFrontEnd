@@ -235,7 +235,10 @@ export const featureShowcase: Roadmap = {
             source: '10',
             target: '14',
             type: 'smoothstep',
-            style: { stroke: '#cbd5e1' }
+            style: { stroke: '#cbd5e1' },
+            sourceHandle: 'right-source',
+            targetHandle: 'left-target',
+            label: 'Explicit Direction'
         },
         {
             id: 'e14-15',

@@ -160,7 +160,9 @@ export const microservicesArchitecture: Roadmap = {
             type: 'smoothstep',
             label: 'Auth',
             style: { stroke: '#0ea5e9', strokeWidth: 2 },
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#0ea5e9' }
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#0ea5e9' },
+            sourceHandle: 'left-source',
+            targetHandle: 'top-target'
         },
         {
             id: 'e-gateway-order',
@@ -169,7 +171,9 @@ export const microservicesArchitecture: Roadmap = {
             type: 'smoothstep',
             label: 'Proxy',
             style: { stroke: '#0ea5e9', strokeWidth: 2 },
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#0ea5e9' }
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#0ea5e9' },
+            sourceHandle: 'bottom-source',
+            targetHandle: 'top-target'
         },
         {
             id: 'e-gateway-payment',
@@ -178,7 +182,9 @@ export const microservicesArchitecture: Roadmap = {
             type: 'smoothstep',
             label: 'Proxy',
             style: { stroke: '#0ea5e9', strokeWidth: 2 },
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#0ea5e9' }
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#0ea5e9' },
+            sourceHandle: 'right-source',
+            targetHandle: 'top-target'
         },
 
         // Services to DB (Step - rigid connection)
@@ -188,7 +194,9 @@ export const microservicesArchitecture: Roadmap = {
             target: 'auth-db',
             type: 'step',
             style: { stroke: '#ea580c', strokeWidth: 2, strokeDasharray: '5,5' },
-            markerEnd: { type: MarkerType.Arrow, color: '#ea580c' }
+            markerEnd: { type: MarkerType.Arrow, color: '#ea580c' },
+            sourceHandle: 'bottom-source',
+            targetHandle: 'top-target'
         },
         {
             id: 'e-order-db',
@@ -196,7 +204,9 @@ export const microservicesArchitecture: Roadmap = {
             target: 'order-db',
             type: 'step',
             style: { stroke: '#16a34a', strokeWidth: 2, strokeDasharray: '5,5' },
-            markerEnd: { type: MarkerType.Arrow, color: '#16a34a' }
+            markerEnd: { type: MarkerType.Arrow, color: '#16a34a' },
+            sourceHandle: 'bottom-source',
+            targetHandle: 'top-target'
         },
 
         // Inter-service via Event Bus (Straight - direct logic)
@@ -207,7 +217,9 @@ export const microservicesArchitecture: Roadmap = {
             type: 'straight',
             label: 'OrderCreated',
             style: { stroke: '#9333ea', strokeWidth: 2 },
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#9333ea' }
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#9333ea' },
+            sourceHandle: 'bottom-source',
+            targetHandle: 'top-target'
         },
         {
             id: 'e-bus-email',
@@ -216,7 +228,9 @@ export const microservicesArchitecture: Roadmap = {
             type: 'straight',
             label: 'Consume',
             style: { stroke: '#9333ea', strokeWidth: 2 },
-            markerEnd: { type: MarkerType.ArrowClosed, color: '#9333ea' }
+            markerEnd: { type: MarkerType.ArrowClosed, color: '#9333ea' },
+            sourceHandle: 'right-source',
+            targetHandle: 'left-target'
         },
 
         // Note connection

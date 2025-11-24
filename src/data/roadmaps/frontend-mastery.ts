@@ -98,7 +98,7 @@ export const frontendMastery: Roadmap = {
             id: 'e-decision-react',
             source: 'decision-framework',
             target: 'react-path',
-            sourceHandle: 'right',
+            sourceHandle: 'right-source',
             label: 'React (Popular)',
             style: { stroke: '#3b82f6' }
         },
@@ -106,7 +106,7 @@ export const frontendMastery: Roadmap = {
             id: 'e-decision-vue',
             source: 'decision-framework',
             target: 'vue-path',
-            sourceHandle: 'left',
+            sourceHandle: 'left-source',
             label: 'Vue (Easy)',
             style: { stroke: '#10b981' }
         },
