@@ -4,6 +4,7 @@ import { AuthPage } from './components/auth/AuthPage';
 import { Header } from './components/layout/Header';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { Workspace } from './components/workspace/Workspace';
+import { RoadmapView } from './components/roadmaps/RoadmapView';
 import { AnimatePresence } from 'framer-motion';
 import { AnimatedPage } from './components/ui/AnimatedPage';
 import { useIsMobile } from './hooks/useIsMobile';
@@ -57,6 +58,14 @@ const AppContent = () => {
             <ProtectedRoute>
               <AnimatedPage key="workspace">
                 <WorkspaceWrapper />
+              </AnimatedPage>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/roadmap/:roadmapId" element={
+            <ProtectedRoute>
+              <AnimatedPage key="roadmap">
+                <RoadmapView />
               </AnimatedPage>
             </ProtectedRoute>
           } />

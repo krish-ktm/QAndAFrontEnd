@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, MessageSquare, Brain, FileText, Layers, Compass } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { apiService } from '../../services/apiService';
 import { Product, Progress, Topic } from '../../types/api';
 import { QnASection } from './QnASection';
@@ -7,8 +8,6 @@ import { QuizSectionMobile } from './QuizSectionMobile';
 import { PDFSection } from './PDFSection';
 import { FlashcardSection } from './FlashcardSection';
 import { RoadmapList } from '../roadmaps/RoadmapList';
-import { RoadmapView } from '../roadmaps/RoadmapView';
-import { AnimatePresence, motion } from 'framer-motion';
 
 interface WorkspaceMobileProps {
     productId: string;
@@ -18,9 +17,9 @@ interface WorkspaceMobileProps {
 type Section = 'qna' | 'quiz' | 'pdf' | 'flashcards' | 'roadmaps';
 
 export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => {
+    const navigate = useNavigate();
     const [activeSection, setActiveSection] = useState<Section>('qna');
     const [quizView, setQuizView] = useState<'groups' | 'active'>('groups');
-    const [selectedRoadmapId, setSelectedRoadmapId] = useState<string | null>(null);
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -104,9 +103,7 @@ export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => 
     ];
 
     const handleBack = () => {
-        if (selectedRoadmapId) {
-            setSelectedRoadmapId(null);
-        } else if (activeSection === 'quiz' && quizView === 'active') {
+        if (activeSection === 'quiz' && quizView === 'active') {
             setQuizView('groups');
         } else {
             onBack();
@@ -183,7 +180,7 @@ export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => 
                 {activeSection === 'roadmaps' && (
                     <RoadmapList
                         productId={productId}
-                        onSelectRoadmap={setSelectedRoadmapId}
+                        onSelectRoadmap={(id) => navigate(`/roadmap/${id}`)}
                     />
                 )}
             </main>
@@ -210,24 +207,6 @@ export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => 
                     })}
                 </ul>
             </nav>
-
-            {/* Full Screen Roadmap View Overlay */}
-            <AnimatePresence>
-                {selectedRoadmapId && (
-                    <motion.div
-                        initial={{ opacity: 0, y: '100%' }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed inset-0 z-50 bg-white"
-                    >
-                        <RoadmapView
-                            roadmapId={selectedRoadmapId}
-                            onBack={() => setSelectedRoadmapId(null)}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 };

@@ -24,7 +24,7 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmapId, onBack }) =
         if (onBack) {
             onBack();
         } else {
-            navigate('/roadmaps');
+            navigate(-1);
         }
     };
 
