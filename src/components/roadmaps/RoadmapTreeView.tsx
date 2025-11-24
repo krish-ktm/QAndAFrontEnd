@@ -35,6 +35,10 @@ import { RoadmapQueueNode } from './RoadmapQueueNode';
 import { RoadmapUMLNode } from './RoadmapUMLNode';
 import { RoadmapMathNode } from './RoadmapMathNode';
 import { RoadmapLinkedListNode } from './RoadmapLinkedListNode';
+import { RoadmapLoadBalancerNode } from './RoadmapLoadBalancerNode';
+import { RoadmapCacheNode } from './RoadmapCacheNode';
+import { RoadmapCDNNode } from './RoadmapCDNNode';
+import { RoadmapStorageNode } from './RoadmapStorageNode';
 
 // Define custom node types
 const nodeTypes = {
@@ -56,6 +60,10 @@ const nodeTypes = {
     uml: RoadmapUMLNode,
     math: RoadmapMathNode,
     linkedList: RoadmapLinkedListNode,
+    loadBalancer: RoadmapLoadBalancerNode,
+    cache: RoadmapCacheNode,
+    cdn: RoadmapCDNNode,
+    storage: RoadmapStorageNode,
 };
 
 const edgeTypes = {
@@ -113,6 +121,21 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
         } else if (node.type === 'linkedList') {
             width = 180;
             height = 80;
+        } else if (node.type === 'linkedList') {
+            width = 180;
+            height = 80;
+        } else if (node.type === 'loadBalancer') {
+            width = 112; // w-28
+            height = 96; // h-24
+        } else if (node.type === 'cache') {
+            width = 128; // w-32
+            height = 100;
+        } else if (node.type === 'cdn') {
+            width = 128; // w-32
+            height = 80; // h-20
+        } else if (node.type === 'storage') {
+            width = 96; // w-24
+            height = 96; // h-24
         }
 
         dagreGraph.setNode(node.id, { width, height });
@@ -158,6 +181,21 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
         } else if (node.type === 'linkedList') {
             width = 180;
             height = 80;
+        } else if (node.type === 'linkedList') {
+            width = 180;
+            height = 80;
+        } else if (node.type === 'loadBalancer') {
+            width = 112; // w-28
+            height = 96; // h-24
+        } else if (node.type === 'cache') {
+            width = 128; // w-32
+            height = 100;
+        } else if (node.type === 'cdn') {
+            width = 128; // w-32
+            height = 80; // h-20
+        } else if (node.type === 'storage') {
+            width = 96; // w-24
+            height = 96; // h-24
         }
 
         return {

@@ -28,6 +28,23 @@ export const RoadmapDatabaseNode = memo(({ data, selected }: NodeProps) => {
 
                 {/* Connection Status Indicator */}
                 <div className={`absolute bottom-2 right-2 w-2.5 h-2.5 rounded-full border border-white z-30 ${connectionStatus === 'active' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+
+                {/* Handles - Moved inside the visual container */}
+                {/* TOP */}
+                <Handle type="target" position={Position.Top} id="top-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+                <Handle type="source" position={Position.Top} id="top-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+
+                {/* BOTTOM */}
+                <Handle type="source" position={Position.Bottom} id="bottom-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+                <Handle type="target" position={Position.Bottom} id="bottom-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+
+                {/* LEFT */}
+                <Handle type="target" position={Position.Left} id="left-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+                <Handle type="source" position={Position.Left} id="left-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+
+                {/* RIGHT */}
+                <Handle type="source" position={Position.Right} id="right-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
+                <Handle type="target" position={Position.Right} id="right-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0" />
             </div>
 
             {/* Shards/Replicas Indicator */}
@@ -39,23 +56,6 @@ export const RoadmapDatabaseNode = memo(({ data, selected }: NodeProps) => {
                     <span className="text-[9px] text-slate-400 font-mono ml-1">x{shards}</span>
                 </div>
             )}
-
-            {/* Handles */}
-            {/* TOP */}
-            <Handle type="target" position={Position.Top} id="top-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="source" position={Position.Top} id="top-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            {/* BOTTOM */}
-            <Handle type="source" position={Position.Bottom} id="bottom-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="target" position={Position.Bottom} id="bottom-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            {/* LEFT */}
-            <Handle type="target" position={Position.Left} id="left-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="source" position={Position.Left} id="left-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            {/* RIGHT */}
-            <Handle type="source" position={Position.Right} id="right-source" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Handle type="target" position={Position.Right} id="right-target" className="!bg-slate-400 !w-2 !h-2 !border-0 opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
     );
 });
