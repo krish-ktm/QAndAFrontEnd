@@ -8,6 +8,7 @@ import { QuizSectionMobile } from './QuizSectionMobile';
 import { PDFSection } from './PDFSection';
 import { FlashcardSection } from './FlashcardSection';
 import { RoadmapList } from '../roadmaps/RoadmapList';
+import { RoadmapView } from '../roadmaps/RoadmapView';
 
 interface WorkspaceMobileProps {
     productId: string;
@@ -19,6 +20,7 @@ type Section = 'qna' | 'quiz' | 'pdf' | 'flashcards' | 'roadmaps';
 export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => {
     const navigate = useNavigate();
     const [activeSection, setActiveSection] = useState<Section>('qna');
+    const [selectedRoadmapId, setSelectedRoadmapId] = useState<string | null>(null);
     const [quizView, setQuizView] = useState<'groups' | 'active'>('groups');
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -122,91 +124,102 @@ export const WorkspaceMobile = ({ productId, onBack }: WorkspaceMobileProps) => 
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            {/* Mobile Header */}
-            <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
-                <button
-                    onClick={handleBack}
-                    className="p-2 -ml-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
-                >
-                    <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h1 className="text-sm font-bold text-gray-900 truncate max-w-[200px]">
-                    {getHeaderTitle()}
-                </h1>
-                <div className="w-8 h-8 flex items-center justify-center">
-                    <div className="relative w-8 h-8 flex items-center justify-center">
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle
-                                cx="16"
-                                cy="16"
-                                r="14"
-                                stroke="currentColor"
-                                strokeWidth="3"
-                                fill="transparent"
-                                className="text-gray-200"
-                            />
-                            <circle
-                                cx="16"
-                                cy="16"
-                                r="14"
-                                stroke="currentColor"
-                                strokeWidth="3"
-                                fill="transparent"
-                                strokeDasharray={88}
-                                strokeDashoffset={88 - (88 * overallProgress) / 100}
-                                className="text-blue-600"
-                            />
-                        </svg>
-                        <span className="absolute text-[10px] font-bold text-gray-700">
-                            {overallProgress}%
-                        </span>
+        <>
+            <div className={`min-h-screen bg-gray-50 flex flex-col ${selectedRoadmapId ? 'hidden' : ''}`}>
+                {/* Mobile Header */}
+                <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+                    <button
+                        onClick={handleBack}
+                        className="p-2 -ml-2 text-gray-600 hover:text-gray-900 rounded-full hover:bg-gray-100"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <h1 className="text-sm font-bold text-gray-900 truncate max-w-[200px]">
+                        {getHeaderTitle()}
+                    </h1>
+                    <div className="w-8 h-8 flex items-center justify-center">
+                        <div className="relative w-8 h-8 flex items-center justify-center">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle
+                                    cx="16"
+                                    cy="16"
+                                    r="14"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    fill="transparent"
+                                    className="text-gray-200"
+                                />
+                                <circle
+                                    cx="16"
+                                    cy="16"
+                                    r="14"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    fill="transparent"
+                                    strokeDasharray={88}
+                                    strokeDashoffset={88 - (88 * overallProgress) / 100}
+                                    className="text-blue-600"
+                                />
+                            </svg>
+                            <span className="absolute text-[10px] font-bold text-gray-700">
+                                {overallProgress}%
+                            </span>
+                        </div>
                     </div>
+                </header>
+
+                {/* Main Content */}
+                <main className="flex-1 overflow-y-auto pb-20">
+                    {activeSection === 'qna' && <QnASection productId={productId} />}
+                    {activeSection === 'quiz' && (
+                        <QuizSectionMobile
+                            productId={productId}
+                            view={quizView}
+                            onViewChange={setQuizView}
+                        />
+                    )}
+                    {activeSection === 'pdf' && <PDFSection productId={productId} />}
+                    {activeSection === 'flashcards' && <FlashcardSection productId={productId} />}
+                    {activeSection === 'roadmaps' && (
+                        <RoadmapList
+                            productId={productId}
+                            onSelectRoadmap={setSelectedRoadmapId}
+                        />
+                    )}
+                </main>
+
+                {/* Bottom Navigation */}
+                <nav className="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-30 pb-safe">
+                    <ul className="flex justify-around items-center h-16">
+                        {sections.map((section) => {
+                            const Icon = section.icon;
+                            const isActive = activeSection === section.id;
+
+                            return (
+                                <li key={section.id} className="flex-1">
+                                    <button
+                                        onClick={() => setActiveSection(section.id)}
+                                        className={`w-full h-full flex flex-col items-center justify-center gap-1 ${isActive ? 'text-blue-600' : 'text-gray-500'
+                                            }`}
+                                    >
+                                        <Icon className={`w-6 h-6 ${isActive ? 'fill-current' : ''}`} strokeWidth={isActive ? 2 : 1.5} />
+                                        <span className="text-[10px] font-medium">{section.label}</span>
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </nav>
+            </div>
+
+            {selectedRoadmapId && (
+                <div className="fixed inset-0 z-50 bg-white">
+                    <RoadmapView
+                        roadmapId={selectedRoadmapId}
+                        onBack={() => setSelectedRoadmapId(null)}
+                    />
                 </div>
-            </header>
-
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto pb-20">
-                {activeSection === 'qna' && <QnASection productId={productId} />}
-                {activeSection === 'quiz' && (
-                    <QuizSectionMobile
-                        productId={productId}
-                        view={quizView}
-                        onViewChange={setQuizView}
-                    />
-                )}
-                {activeSection === 'pdf' && <PDFSection productId={productId} />}
-                {activeSection === 'flashcards' && <FlashcardSection productId={productId} />}
-                {activeSection === 'roadmaps' && (
-                    <RoadmapList
-                        productId={productId}
-                        onSelectRoadmap={(id) => navigate(`/roadmap/${id}`)}
-                    />
-                )}
-            </main>
-
-            {/* Bottom Navigation */}
-            <nav className="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-30 pb-safe">
-                <ul className="flex justify-around items-center h-16">
-                    {sections.map((section) => {
-                        const Icon = section.icon;
-                        const isActive = activeSection === section.id;
-
-                        return (
-                            <li key={section.id} className="flex-1">
-                                <button
-                                    onClick={() => setActiveSection(section.id)}
-                                    className={`w-full h-full flex flex-col items-center justify-center gap-1 ${isActive ? 'text-blue-600' : 'text-gray-500'
-                                        }`}
-                                >
-                                    <Icon className={`w-6 h-6 ${isActive ? 'fill-current' : ''}`} strokeWidth={isActive ? 2 : 1.5} />
-                                    <span className="text-[10px] font-medium">{section.label}</span>
-                                </button>
-                            </li>
-                        );
-                    })}
-                </ul>
-            </nav>
-        </div>
+            )}
+        </>
     );
 };

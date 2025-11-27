@@ -4,10 +4,10 @@ import { UserService } from './userService';
 import { ProductService } from './productService';
 import { AdminService } from './adminService';
 
-import { 
-  mockAuthApi, 
-  mockUserApi, 
-  mockProductApi 
+import {
+  mockAuthApi,
+  mockUserApi,
+  mockProductApi
 } from './mockApi';
 
 import {
@@ -54,7 +54,7 @@ export class APIService {
     this.productService = new ProductService(this.apiClient);
     this.adminService = new AdminService(this.apiClient);
   }
-  
+
   // Method to get the admin service when needed
   getAdminService(): AdminService {
     return this.adminService;
@@ -190,7 +190,7 @@ export class APIService {
     }
     return this.productService.getProducts();
   }
-  
+
   async getProductDetail(productId: string): Promise<ApiResponse<Product>> {
     if (USE_MOCK_API) {
       const response = await mockProductApi.getProducts();
@@ -214,9 +214,9 @@ export class APIService {
   }
 
   async getQnA(
-    productId: string, 
-    filters: { 
-      topicId?: string; 
+    productId: string,
+    filters: {
+      topicId?: string;
       level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
       company?: string;
       page?: number;
@@ -251,9 +251,9 @@ export class APIService {
   }
 
   async getQuizzes(
-    productId: string, 
-    filters: { 
-      quizGroupId?: string; 
+    productId: string,
+    filters: {
+      quizGroupId?: string;
       level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
       company?: string;
       page?: number;
@@ -274,8 +274,8 @@ export class APIService {
   }
 
   async submitQuizAnswer(
-    productId: string, 
-    quizId: string, 
+    productId: string,
+    quizId: string,
     data: QuizSubmitRequest
   ): Promise<ApiResponse<QuizSubmitResponse>> {
     if (USE_MOCK_API) {
@@ -283,14 +283,14 @@ export class APIService {
     }
     return this.productService.submitQuizAnswer(productId, quizId, data);
   }
-  
+
   async getPDFs(productId: string): Promise<ApiResponse<PDF[]>> {
     if (USE_MOCK_API) {
       return mockProductApi.getPDFs(productId);
     }
     return this.productService.getPDFs(productId);
   }
-  
+
   async getPDFDetail(productId: string, pdfId: string): Promise<ApiResponse<PDF>> {
     if (USE_MOCK_API) {
       return mockProductApi.getPDFDetail(productId, pdfId);

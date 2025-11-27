@@ -34,6 +34,13 @@ export const RoadmapQueueNode = memo(({ data, selected }: NodeProps) => {
                 {/* Consumer Count Badge */}
                 {consumers && (
                     <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-slate-900 shadow-sm flex items-center gap-0.5">
+                        {consumers}
                     </div>
-                );
+                )}
+            </div>
+
+            <Handle type="target" position={Position.Left} className="!bg-slate-400 !w-2 !h-2 !border-0" />
+            <Handle type="source" position={Position.Right} className="!bg-slate-400 !w-2 !h-2 !border-0" />
+        </div>
+    );
 });

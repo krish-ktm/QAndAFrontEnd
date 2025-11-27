@@ -62,9 +62,9 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
 
-          <Route path="/roadmap/:roadmapId" element={
+          <Route path="/roadmap/:id" element={
             <ProtectedRoute>
-              <AnimatedPage key="roadmap">
+              <AnimatedPage key="roadmap" className="h-screen">
                 <RoadmapView />
               </AnimatedPage>
             </ProtectedRoute>
