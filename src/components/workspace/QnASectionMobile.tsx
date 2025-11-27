@@ -257,6 +257,7 @@ export const QnASectionMobile = ({ productId }: QnASectionMobileProps) => {
                     toggleExpand={toggleExpand}
                     toggleBookmark={toggleBookmark}
                     isLoading={loadingTopicId !== ''}
+                    disableAnimation={true}
                 />
 
                 {filteredQnA.length > 0 && (

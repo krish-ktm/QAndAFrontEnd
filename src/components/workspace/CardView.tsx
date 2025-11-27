@@ -10,6 +10,7 @@ interface CardViewProps {
   toggleExpand: (id: string) => void;
   toggleBookmark: (id: string) => void;
   isLoading?: boolean;
+  disableAnimation?: boolean;
 }
 
 export const CardView = ({
@@ -18,7 +19,8 @@ export const CardView = ({
   bookmarkedIds,
   toggleExpand,
   toggleBookmark,
-  isLoading = false
+  isLoading = false,
+  disableAnimation = false
 }: CardViewProps) => {
   if (isLoading) {
     return (
@@ -127,35 +129,56 @@ export const CardView = ({
 
               {/* Answer section */}
               {/* Answer section */}
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
-                    style={{ willChange: 'height, opacity' }}
-                  >
-                    <div className="border-t border-gray-100 pt-3">
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <Eye className="w-3 h-3 text-blue-500" />
-                        <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Answer</span>
-                      </div>
-                      <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-lg p-3 border border-gray-100">
-                        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                          {qna.answer}
-                        </p>
-                        {qna.exampleCode && (
-                          <pre className="bg-gray-900 text-gray-100 text-xs p-3 rounded-lg overflow-x-auto mt-3 border border-gray-200 font-mono">
-                            {qna.exampleCode}
-                          </pre>
-                        )}
-                      </div>
+              {disableAnimation ? (
+                isExpanded && (
+                  <div className="border-t border-gray-100 pt-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Eye className="w-3 h-3 text-blue-500" />
+                      <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Answer</span>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-lg p-3 border border-gray-100">
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                        {qna.answer}
+                      </p>
+                      {qna.exampleCode && (
+                        <pre className="bg-gray-900 text-gray-100 text-xs p-3 rounded-lg overflow-x-auto mt-3 border border-gray-200 font-mono">
+                          {qna.exampleCode}
+                        </pre>
+                      )}
+                    </div>
+                  </div>
+                )
+              ) : (
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                      style={{ willChange: 'height, opacity' }}
+                    >
+                      <div className="border-t border-gray-100 pt-3">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <Eye className="w-3 h-3 text-blue-500" />
+                          <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Answer</span>
+                        </div>
+                        <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-lg p-3 border border-gray-100">
+                          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                            {qna.answer}
+                          </p>
+                          {qna.exampleCode && (
+                            <pre className="bg-gray-900 text-gray-100 text-xs p-3 rounded-lg overflow-x-auto mt-3 border border-gray-200 font-mono">
+                              {qna.exampleCode}
+                            </pre>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
 
               {/* Action button */}
               <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
